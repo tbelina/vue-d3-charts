@@ -251,7 +251,7 @@ const __vue_is_functional_template__ = false;
 
 /* style inject shadow dom */
 
-const __vue_component__ = normalizeComponent({
+const __vue_component__ = /*#__PURE__*/normalizeComponent({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, createInjector, undefined, undefined);
@@ -413,7 +413,8 @@ class d3chart {
   */
 
 
-  initChartFrame(classname = 'undefined') {
+  initChartFrame() {
+    let classname = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'undefined';
     // Wrapper div
     this.wrap = this.selection.append('div').attr("class", "chart__wrap chart__wrap--" + classname); // SVG element
 
@@ -429,7 +430,8 @@ class d3chart {
   */
 
 
-  colorElement(d, key = undefined) {
+  colorElement(d) {
+    let key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
     key = key ? key : this.cfg.key; // if key is set, return own object color key
 
     if (this.cfg.color.key) return d[this.cfg.color.key]; // base color is default one if current key is set, else current one
@@ -699,8 +701,9 @@ class d3barchart extends d3chart {
       return this.cfg.orientation !== 'horizontal' ? this.cfg.height : this.xScaleInn(this.cfg.values[i % this.cfg.values.length]);
     }).attr('height', 0).attr('width', 0).on('mouseover', (d, i) => {
       const key = this.cfg.values[i % this.cfg.values.length];
+      const label = this.cfg.tooltip ? d[this.cfg.tooltip.label] : key;
       this.tooltip.html(() => {
-        return `<div>${key}: ${d[key]}</div>`;
+        return `<div>${label}: ${d[key]}</div>`;
       }).classed('active', true);
     }).on('mouseout', () => {
       this.tooltip.classed('active', false);
@@ -772,7 +775,7 @@ const __vue_is_functional_template__$1 = undefined;
 
 /* style inject shadow dom */
 
-const __vue_component__$1 = normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);
+const __vue_component__$1 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);
 
 const d3$2 = {
   select,
@@ -1113,9 +1116,350 @@ const __vue_is_functional_template__$2 = undefined;
 
 /* style inject shadow dom */
 
-const __vue_component__$2 = normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);
+const __vue_component__$2 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);
 
 const d3$3 = {
+  select,
+  selectAll,
+  scaleOrdinal,
+  scaleLinear,
+  scaleTime,
+  timeParse,
+  timeFormat,
+  max,
+  extent,
+  line,
+  transition,
+  axisLeft,
+  axisBottom,
+  easeLinear,
+  easePolyIn,
+  easePolyOut,
+  easePoly,
+  easePolyInOut,
+  easeQuadIn,
+  easeQuadOut,
+  easeQuad,
+  easeQuadInOut,
+  easeCubicIn,
+  easeCubicOut,
+  easeCubic,
+  easeCubicInOut,
+  easeSinIn,
+  easeSinOut,
+  easeSin,
+  easeSinInOut,
+  easeExpIn,
+  easeExpOut,
+  easeExp,
+  easeExpInOut,
+  easeCircleIn,
+  easeCircleOut,
+  easeCircle,
+  easeCircleInOut,
+  easeElasticIn,
+  easeElastic,
+  easeElasticOut,
+  easeElasticInOut,
+  easeBackIn,
+  easeBackOut,
+  easeBack,
+  easeBackInOut,
+  easeBounceIn,
+  easeBounce,
+  easeBounceOut,
+  easeBounceInOut,
+  curveBasis,
+  curveBundle,
+  curveCardinal,
+  curveCatmullRom,
+  curveLinear,
+  curveMonotoneX,
+  curveMonotoneY,
+  curveNatural,
+  curveStep,
+  curveStepAfter,
+  curveStepBefore,
+  schemeCategory10,
+  schemeAccent,
+  schemeDark2,
+  schemePaired,
+  schemePastel1,
+  schemePastel2,
+  schemeSet1,
+  schemeSet2,
+  schemeSet3,
+  schemeTableau10
+};
+/**
+ * D3 Area Chart
+ */
+
+class d3areachart extends d3chart {
+  constructor(selection, data, config) {
+    super(selection, data, config, {
+      margin: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 40
+      },
+      values: [],
+      date: {
+        key: false,
+        inputFormat: "%Y-%m-%d",
+        outputFormat: "%Y-%m-%d"
+      },
+      color: {
+        key: false,
+        keys: false,
+        scheme: false,
+        current: '#1f77b4',
+        default: '#AAA',
+        axis: '#000'
+      },
+      curve: 'curveLinear',
+      points: {
+        visibleSize: 3,
+        hoverSize: 6
+      },
+      axis: {
+        yTitle: false,
+        xTitle: false,
+        yFormat: ".0f",
+        xFormat: "%Y-%m-%d",
+        yTicks: 5,
+        xTicks: 3
+      },
+      tooltip: {
+        labels: false
+      },
+      transition: {
+        duration: 350,
+        ease: 'easeLinear'
+      }
+    });
+  }
+  /**
+  * Init chart
+  */
+
+
+  initChart() {
+    // Set up dimensions
+    this.getDimensions();
+    this.initChartFrame('areachart'); // Format date functions
+
+    this.parseTime = d3$3.timeParse(this.cfg.date.inputFormat);
+    this.formatTime = d3$3.timeFormat(this.cfg.date.outputFormat); // Init scales
+
+    this.yScale = d3$3.scaleLinear();
+    this.xScale = d3$3.scaleTime();
+    this.line = d3$3.line(); // Axis group
+
+    this.axisg = this.g.append('g').attr('class', 'chart__axis chart__axis--areachart'); // Horizontal grid
+
+    this.yGrid = this.axisg.append("g").attr("class", "chart__grid chart__grid--y chart__grid--areachart"); // Bottom axis
+
+    this.xAxis = this.axisg.append("g").attr("class", "chart__axis-x chart__axis-x--areachart"); // Vertical axis
+
+    this.yAxis = this.axisg.append("g").attr("class", "chart__axis-y chart__axis-y--areachart chart__grid"); // Vertical axis title
+
+    if (this.cfg.axis.yTitle) this.yAxisTitle = this.axisg.append('text').attr('class', 'chart__axis-title chart__axis-title--areachart').attr("transform", 'rotate(-90)').style("text-anchor", "middle");
+    this.setChartDimension();
+    this.updateChart();
+  }
+  /**
+   * Calcule required derivated data
+   */
+
+
+  computeData() {
+    // Calcule transpose data
+    const tData = [];
+    this.cfg.values.forEach((j, i) => {
+      tData[i] = {};
+      tData[i].key = j;
+      tData[i].values = [];
+    });
+    this.data.forEach(d => {
+      d.jsdate = this.parseTime(d[this.cfg.date.key]);
+    });
+    this.data.sort((a, b) => a.jsdate - b.jsdate);
+    this.data.forEach((d, c) => {
+      d.min = 9999999999999999999;
+      d.max = -9999999999999999999;
+      this.cfg.values.forEach((j, i) => {
+        tData[i].values.push({
+          x: d.jsdate,
+          y: +d[j],
+          k: i
+        });
+        if (d[j] < d.min) d.min = +d[j];
+        if (d[j] > d.max) d.max = +d[j];
+      });
+    });
+    this.tData = tData;
+  }
+  /**
+   * Set up chart dimensions (non depending on data)
+   */
+
+
+  setChartDimension() {
+    // Resize SVG element
+    this.svg.attr("viewBox", `0 0 ${this.cfg.width + this.cfg.margin.left + this.cfg.margin.right} ${this.cfg.height + this.cfg.margin.top + this.cfg.margin.bottom}`).attr("width", this.cfg.width + this.cfg.margin.left + this.cfg.margin.right).attr("height", this.cfg.height + this.cfg.margin.top + this.cfg.margin.bottom); // Vertical axis title
+
+    if (this.cfg.axis.yTitle) this.yAxisTitle.attr("y", -this.cfg.margin.left + 10).attr("x", -this.cfg.height / 2).text(this.cfg.axis.yTitle);
+  }
+  /**
+   * Set up scales
+   */
+
+
+  setScales() {
+    // Calcule vertical scale
+    this.yScale.domain([0, d3$3.max(this.data, d => d.max)]).rangeRound([this.cfg.height, 0]); // Calcule horizontal scale
+
+    this.xScale.domain(d3$3.extent(this.data, d => d.jsdate)).rangeRound([0, this.cfg.width]);
+
+    if (this.cfg.color.scheme instanceof Array === true) {
+      this.colorScale = d3$3.scaleOrdinal().range(this.cfg.color.scheme);
+    } else if (typeof this.cfg.color.scheme === 'string') {
+      this.colorScale = d3$3.scaleOrdinal(d3$3[this.cfg.color.scheme]);
+    } // Set up line function
+
+
+    this.line.x(d => this.xScale(d.x)).y(d => this.yScale(d.y)).curve(d3$3[this.cfg.curve]); // Redraw grid
+
+    this.yGrid.call(d3$3.axisLeft(this.yScale).tickSize(-this.cfg.width).ticks(this.cfg.axis.yTicks, this.cfg.axis.yFormat)); // Redraw horizontal axis
+
+    this.xAxis.attr("transform", `translate(0,${this.cfg.height})`).call(d3$3.axisBottom(this.xScale).tickFormat(this.formatTime).ticks(this.cfg.axis.xTicks, this.cfg.axis.xFormat));
+  }
+  /**
+   * Bind data to main elements groups
+   */
+
+
+  bindData() {
+    // Set transition
+    this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]); // Lines group
+
+    this.linesgroup = this.g.selectAll(".chart__lines-group").data(this.tData, d => d.key); // Don't continue if points are disabled
+
+    if (this.cfg.points === false) return; // Set points store
+
+    if (!this.pointsg || this.pointsg instanceof Array === false) {
+      this.pointsg = [];
+    }
+  }
+  /**
+   * Add new chart's elements
+   */
+
+
+  enterElements() {
+    // Elements to add
+    const newgroups = this.linesgroup.enter().append('g').attr("class", "chart__lines-group chart__lines-group--areachart"); // Lines
+
+    newgroups.append('path').attr("class", "chart__line chart__line--areachart").attr('fill', 'transparent').attr("d", d => this.line(d.values.map(v => ({
+      y: 0,
+      x: v.x,
+      k: v.k
+    })))); // Don't continue if points are disabled
+
+    if (this.cfg.points === false) return;
+    this.cfg.values.forEach((k, i) => {
+      // Point group
+      let gp = this.g.selectAll('.chart__points-group--' + k).data(this.data).enter().append('g').attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + k).attr('transform', d => `translate(${this.xScale(d.jsdate)},${this.cfg.height})`); // Hover point
+
+      gp.append('circle').attr('class', 'chart__point-hover chart__point-hover--areachart').attr('fill', 'transparent').attr('r', this.cfg.points.hoverSize).on('mouseover', (d, j) => {
+        this.tooltip.html(_ => {
+          const label = this.cfg.tooltip.labels && this.cfg.tooltip.labels[i] ? this.cfg.tooltip.labels[i] : k;
+          return `
+                            <div>${label}: ${this.tData[i].values[j].y}</div>
+                        `;
+        }).classed('active', true);
+      }).on('mouseout', _ => {
+        this.tooltip.classed('active', false);
+      }).on('mousemove', _ => {
+        this.tooltip.style('left', window.event['pageX'] - 28 + 'px').style('top', window.event['pageY'] - 40 + 'px');
+      }); // Visible point
+
+      gp.append('circle').attr('class', 'chart__point-visible chart__point-visible--areachart').attr('pointer-events', 'none');
+      this.pointsg.push({
+        selection: gp,
+        key: k
+      });
+    });
+  }
+  /**
+   * Update chart's elements based on data change
+   */
+
+
+  updateElements() {
+    // Color lines
+    this.linesgroup.attr('stroke', d => this.colorElement(d, 'key')); // Redraw lines
+
+    this.g.selectAll('.chart__line').attr('stroke', d => this.colorElement(d, 'key')).transition(this.transition).attr("d", (d, i) => this.line(this.tData[i].values)); // Don't continue if points are disabled
+
+    if (this.cfg.points === false) return; // Redraw points
+
+    this.pointsg.forEach((p, i) => {
+      p.selection.transition(this.transition).attr('transform', d => `translate(${this.xScale(d.jsdate)},${this.yScale(d[p.key])})`); // Visible point
+
+      p.selection.selectAll('.chart__point-visible').attr('fill', d => this.colorElement(p, 'key')).attr('r', this.cfg.points.visibleSize); // Hover point
+
+      p.selection.selectAll('.chart__point-hover').attr('r', this.cfg.points.hoverSize);
+    });
+  }
+  /**
+   * Remove chart's elements without data
+   */
+
+
+  exitElements() {
+    this.linesgroup.exit().transition(this.transition).style("opacity", 0).remove();
+  }
+
+}
+
+var script$3 = {
+  name: 'D3AreaChart',
+  extends: __vue_component__,
+
+  mounted() {
+    this.chart = new d3areachart(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
+  }
+
+};
+
+/* script */
+const __vue_script__$3 = script$3;
+/* template */
+
+/* style */
+
+const __vue_inject_styles__$3 = undefined;
+/* scoped */
+
+const __vue_scope_id__$3 = undefined;
+/* module identifier */
+
+const __vue_module_identifier__$3 = undefined;
+/* functional template */
+
+const __vue_is_functional_template__$3 = undefined;
+/* style inject */
+
+/* style inject SSR */
+
+/* style inject shadow dom */
+
+const __vue_component__$3 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, undefined, undefined, undefined);
+
+const d3$4 = {
   select,
   selectAll,
   scaleLinear,
@@ -1218,10 +1562,10 @@ class d3piechart extends d3chart {
     // Set up dimensions
     this.getDimensions();
     this.initChartFrame('piechart');
-    this.cScale = d3$3.scaleOrdinal();
-    this.arc = d3$3.arc();
-    this.outerArc = d3$3.arc();
-    this.pie = d3$3.pie().sort(null).value(d => d[this.cfg.value]).padAngle(this.cfg.radius.padding);
+    this.cScale = d3$4.scaleOrdinal();
+    this.arc = d3$4.arc();
+    this.outerArc = d3$4.arc();
+    this.pie = d3$4.pie().sort(null).value(d => d[this.cfg.value]).padAngle(this.cfg.radius.padding);
 
     if (this.cfg.radius && this.cfg.radius.inner) {
       const outRadius = this.cfg.radius.outter ? this.cfg.radius.outter : Math.min(this.cfg.width, this.cfg.height) / 2;
@@ -1251,7 +1595,7 @@ class d3piechart extends d3chart {
   bindData() {
     this.itemg = this.gcenter.selectAll('.chart__slice-group').data(this.pie(this.data), d => d.data[this.cfg.key]); // Set transition
 
-    this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]);
+    this.transition = d3$4.transition('t').duration(this.cfg.transition.duration).ease(d3$4[this.cfg.transition.ease]);
   }
   /**
   * Set up scales
@@ -1268,14 +1612,14 @@ class d3piechart extends d3chart {
     } // Set up arcs
 
 
-    this.arc = d3$3.arc().outerRadius(this.cfg.radius.outter).innerRadius(inRadius).cornerRadius(this.cfg.radius.round);
-    this.outerArc = d3$3.arc().outerRadius(this.cfg.radius.outter * 1.1).innerRadius(this.cfg.radius.outter * 1.1); // Set up color scheme
+    this.arc = d3$4.arc().outerRadius(this.cfg.radius.outter).innerRadius(inRadius).cornerRadius(this.cfg.radius.round);
+    this.outerArc = d3$4.arc().outerRadius(this.cfg.radius.outter * 1.1).innerRadius(this.cfg.radius.outter * 1.1); // Set up color scheme
 
     if (this.cfg.color.scheme) {
       if (this.cfg.color.scheme instanceof Array === true) {
-        this.colorScale = d3$3.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
+        this.colorScale = d3$4.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
       } else {
-        this.colorScale = d3$3.scaleOrdinal(d3$3[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
+        this.colorScale = d3$4.scaleOrdinal(d3$4[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
       }
     }
   }
@@ -1288,7 +1632,7 @@ class d3piechart extends d3chart {
     const newg = this.itemg.enter().append('g').attr("class", "chart__slice-group chart__slice-group--piechart"); // PATHS
 
     newg.append("path").attr("class", "chart__slice chart__slice--piechart").transition(this.transition).delay((d, i) => i * this.cfg.transition.duration).attrTween('d', d => {
-      const i = d3$3.interpolate(d.startAngle + 0.1, d.endAngle);
+      const i = d3$4.interpolate(d.startAngle + 0.1, d.endAngle);
       return t => {
         d.endAngle = i(t);
         return this.arc(d);
@@ -1315,7 +1659,7 @@ class d3piechart extends d3chart {
   updateElements() {
     // PATHS
     this.itemg.selectAll(".chart__slice").style('opacity', 0).data(this.pie(this.data), d => d.data[this.cfg.key]).transition(this.transition).delay((d, i) => i * this.cfg.transition.duration).attrTween('d', d => {
-      const i = d3$3.interpolate(d.startAngle + 0.1, d.endAngle);
+      const i = d3$4.interpolate(d.startAngle + 0.1, d.endAngle);
       return t => {
         d.endAngle = i(t);
         return this.arc(d);
@@ -1354,14 +1698,14 @@ class d3piechart extends d3chart {
 
 
   arcTween(a) {
-    var i = d3$3.interpolate(this._current, a);
+    var i = d3$4.interpolate(this._current, a);
     this._current = i(0);
     return t => this.arc(i(t));
   }
 
 }
 
-var script$3 = {
+var script$4 = {
   name: 'D3PieChart',
   extends: __vue_component__,
 
@@ -1372,12 +1716,12 @@ var script$3 = {
 };
 
 /* script */
-const __vue_script__$3 = script$3;
+const __vue_script__$4 = script$4;
 /* template */
 
 /* style */
 
-const __vue_inject_styles__$3 = function (inject) {
+const __vue_inject_styles__$4 = function (inject) {
   if (!inject) return;
   inject("data-v-ac66c84e_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}.chart--piechart .chart__line{fill:none;stroke:#000}",
@@ -1388,20 +1732,20 @@ const __vue_inject_styles__$3 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$3 = undefined;
+const __vue_scope_id__$4 = undefined;
 /* module identifier */
 
-const __vue_module_identifier__$3 = undefined;
+const __vue_module_identifier__$4 = undefined;
 /* functional template */
 
-const __vue_is_functional_template__$3 = undefined;
+const __vue_is_functional_template__$4 = undefined;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-const __vue_component__$3 = normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, createInjector, undefined, undefined);
+const __vue_component__$4 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, createInjector, undefined, undefined);
 
-const d3$4 = {
+const d3$5 = {
   select,
   selectAll,
   scaleLinear,
@@ -1504,7 +1848,7 @@ class d3slopechart extends d3chart {
     this.getDimensions();
     this.initChartFrame('slopechart'); // Set up scales
 
-    this.yScale = d3$4.scaleLinear(); // Axis group
+    this.yScale = d3$5.scaleLinear(); // Axis group
 
     const axisg = this.g.append('g').attr('class', 'chart__axis chart__axis--slopechart'); // Vertical left axis
 
@@ -1545,13 +1889,13 @@ class d3slopechart extends d3chart {
 
   setScales() {
     // Set up dimensional scales
-    this.yScale.rangeRound([this.cfg.height, 0]).domain([d3$4.min(this.data, d => d[this.cfg.values[0]] < d[this.cfg.values[1]] ? d[this.cfg.values[0]] * 0.9 : d[this.cfg.values[1]] * 0.9), d3$4.max(this.data, d => d[this.cfg.values[0]] > d[this.cfg.values[1]] ? d[this.cfg.values[0]] * 1.1 : d[this.cfg.values[1]] * 1.1)]); // Set up color scheme
+    this.yScale.rangeRound([this.cfg.height, 0]).domain([d3$5.min(this.data, d => d[this.cfg.values[0]] < d[this.cfg.values[1]] ? d[this.cfg.values[0]] * 0.9 : d[this.cfg.values[1]] * 0.9), d3$5.max(this.data, d => d[this.cfg.values[0]] > d[this.cfg.values[1]] ? d[this.cfg.values[0]] * 1.1 : d[this.cfg.values[1]] * 1.1)]); // Set up color scheme
 
     if (this.cfg.color.scheme) {
       if (this.cfg.color.scheme instanceof Array === true) {
-        this.colorScale = d3$4.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
+        this.colorScale = d3$5.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
       } else {
-        this.colorScale = d3$4.scaleOrdinal(d3$4[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
+        this.colorScale = d3$5.scaleOrdinal(d3$5[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
       }
     }
   }
@@ -1564,7 +1908,7 @@ class d3slopechart extends d3chart {
     // Lines group selection data
     this.linesgroup = this.g.selectAll(".chart__lines-group").data(this.data, d => d[this.cfg.key]); // Set transition
 
-    this.transition = d3$4.transition('t').duration(this.cfg.transition.duration).ease(d3$4[this.cfg.transition.ease]);
+    this.transition = d3$5.transition('t').duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]);
   }
   /**
   * Add new chart's elements
@@ -1621,7 +1965,7 @@ class d3slopechart extends d3chart {
 
 }
 
-var script$4 = {
+var script$5 = {
   name: 'D3SlopeChart',
   extends: __vue_component__,
 
@@ -1632,12 +1976,12 @@ var script$4 = {
 };
 
 /* script */
-const __vue_script__$4 = script$4;
+const __vue_script__$5 = script$5;
 /* template */
 
 /* style */
 
-const __vue_inject_styles__$4 = function (inject) {
+const __vue_inject_styles__$5 = function (inject) {
   if (!inject) return;
   inject("data-v-6b03ba8c_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}.chart--slopegraph .chart__line--current{stroke-width:2px}",
@@ -1648,20 +1992,20 @@ const __vue_inject_styles__$4 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$4 = undefined;
+const __vue_scope_id__$5 = undefined;
 /* module identifier */
 
-const __vue_module_identifier__$4 = undefined;
+const __vue_module_identifier__$5 = undefined;
 /* functional template */
 
-const __vue_is_functional_template__$4 = undefined;
+const __vue_is_functional_template__$5 = undefined;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-const __vue_component__$4 = normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, createInjector, undefined, undefined);
+const __vue_component__$5 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, createInjector, undefined, undefined);
 
-const d3$5 = {
+const d3$6 = {
   select,
   selectAll,
   scaleLinear,
@@ -1781,14 +2125,14 @@ class d3sunburst extends d3chart {
 
   bindData() {
     const partition = data => {
-      const root = d3$5.hierarchy(data).sum(d => d[this.cfg.value]);
-      return d3$5.partition()(root);
+      const root = d3$6.hierarchy(data).sum(d => d[this.cfg.value]);
+      return d3$6.partition()(root);
     };
 
     this.hData = partition(this.data[0]).descendants();
     this.itemg = this.gcenter.selectAll('.chart__slice-group').data(this.hData, d => d.data[this.cfg.key]); // Set transition
 
-    this.transition = d3$5.transition('t').duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]);
+    this.transition = d3$6.transition('t').duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]);
   }
   /**
   * Set up scales
@@ -1797,15 +2141,15 @@ class d3sunburst extends d3chart {
 
   setScales() {
     this.radius = Math.min(this.cfg.width, this.cfg.height) / 2;
-    this.xScale = d3$5.scaleLinear().range([0, 2 * Math.PI]).clamp(true);
-    this.yScale = d3$5.scaleSqrt().range([this.radius * .1, this.radius]);
-    this.arc = d3$5.arc().startAngle(d => this.xScale(d.x0)).endAngle(d => this.xScale(d.x1)).innerRadius(d => Math.max(0, this.yScale(d.y0))).outerRadius(d => Math.max(0, this.yScale(d.y1))); // Set up color scheme
+    this.xScale = d3$6.scaleLinear().range([0, 2 * Math.PI]).clamp(true);
+    this.yScale = d3$6.scaleSqrt().range([this.radius * .1, this.radius]);
+    this.arc = d3$6.arc().startAngle(d => this.xScale(d.x0)).endAngle(d => this.xScale(d.x1)).innerRadius(d => Math.max(0, this.yScale(d.y0))).outerRadius(d => Math.max(0, this.yScale(d.y1))); // Set up color scheme
 
     if (this.cfg.color.scheme) {
       if (this.cfg.color.scheme instanceof Array === true) {
-        this.colorScale = d3$5.scaleOrdinal().range(this.cfg.color.scheme);
+        this.colorScale = d3$6.scaleOrdinal().range(this.cfg.color.scheme);
       } else {
-        this.colorScale = d3$5.scaleOrdinal(d3$5[this.cfg.color.scheme]);
+        this.colorScale = d3$6.scaleOrdinal(d3$6[this.cfg.color.scheme]);
       }
     }
   }
@@ -1829,10 +2173,10 @@ class d3sunburst extends d3chart {
     }).on('mousemove', () => {
       this.tooltip.style('left', window.event['pageX'] - 28 + 'px').style('top', window.event['pageY'] - 40 + 'px');
     }).transition(this.transition).attrTween('d', d => {
-      const iy0 = d3$5.interpolate(0, d.y0);
-      const iy1 = d3$5.interpolate(d.y0, d.y1);
-      const ix0 = d3$5.interpolate(0, d.x0);
-      const ix1 = d3$5.interpolate(0, d.x1);
+      const iy0 = d3$6.interpolate(0, d.y0);
+      const iy1 = d3$6.interpolate(d.y0, d.y1);
+      const ix0 = d3$6.interpolate(0, d.x0);
+      const ix1 = d3$6.interpolate(0, d.x1);
       return t => {
         d.y0 = iy0(t);
         d.y1 = iy1(t);
@@ -1850,10 +2194,10 @@ class d3sunburst extends d3chart {
   updateElements() {
     this.itemg.selectAll('.chart__slice').transition(this.transition).attrTween('d', d => {
       const d2 = this.hData.filter(j => j.data.name === d.data.name)[0];
-      const iy0 = d3$5.interpolate(d.y0, d2.y0);
-      const iy1 = d3$5.interpolate(d.y1, d2.y1);
-      const ix0 = d3$5.interpolate(d.x0, d2.x0);
-      const ix1 = d3$5.interpolate(d.x1, d2.x1);
+      const iy0 = d3$6.interpolate(d.y0, d2.y0);
+      const iy1 = d3$6.interpolate(d.y1, d2.y1);
+      const ix0 = d3$6.interpolate(d.x0, d2.x0);
+      const ix1 = d3$6.interpolate(d.x1, d2.x1);
       return t => {
         d2.y0 = iy0(t);
         d2.y1 = iy1(t);
@@ -1888,9 +2232,9 @@ class d3sunburst extends d3chart {
 
   focusOn(d) {
     const d2 = this.hData.filter(j => j.data.name === d.data.name)[0];
-    const transition = this.svg.transition().duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]).tween('scale', () => {
-      const xd = d3$5.interpolate(this.xScale.domain(), [d2.x0, d2.x1]);
-      const yd = d3$5.interpolate(this.yScale.domain(), [d2.y0, 1]);
+    const transition = this.svg.transition().duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]).tween('scale', () => {
+      const xd = d3$6.interpolate(this.xScale.domain(), [d2.x0, d2.x1]);
+      const yd = d3$6.interpolate(this.yScale.domain(), [d2.y0, 1]);
       return t => {
         this.xScale.domain(xd(t));
         this.yScale.domain(yd(t));
@@ -1904,7 +2248,7 @@ class d3sunburst extends d3chart {
 
 }
 
-var script$5 = {
+var script$6 = {
   name: 'D3Sunburst',
   extends: __vue_component__,
 
@@ -1915,30 +2259,30 @@ var script$5 = {
 };
 
 /* script */
-const __vue_script__$5 = script$5;
+const __vue_script__$6 = script$6;
 /* template */
 
 /* style */
 
-const __vue_inject_styles__$5 = undefined;
+const __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-const __vue_scope_id__$5 = undefined;
+const __vue_scope_id__$6 = undefined;
 /* module identifier */
 
-const __vue_module_identifier__$5 = undefined;
+const __vue_module_identifier__$6 = undefined;
 /* functional template */
 
-const __vue_is_functional_template__$5 = undefined;
+const __vue_is_functional_template__$6 = undefined;
 /* style inject */
 
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-const __vue_component__$5 = normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, undefined, undefined, undefined);
+const __vue_component__$6 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);
 
-const d3$6 = {
+const d3$7 = {
   select,
   selectAll,
   scaleOrdinal,
@@ -2049,7 +2393,7 @@ class d3wordscloud extends d3chart {
 
 
   computeData() {
-    let layout = d3$6.cloud().size([this.cfg.width, this.cfg.height]).words(this.data.map(d => ({
+    let layout = d3$7.cloud().size([this.cfg.width, this.cfg.height]).words(this.data.map(d => ({
       text: d[this.cfg.key],
       size: d[this.cfg.value]
     }))).rotate(() => this.wordsAngle(this.cfg.angle)).font(this.cfg.fontFamily).fontSize(d => d.size).on("end", d => {
@@ -2074,7 +2418,7 @@ class d3wordscloud extends d3chart {
 
   bindData() {
     // Set transition
-    this.transition = d3$6.transition('t').duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]); // Word group selection data
+    this.transition = d3$7.transition('t').duration(this.cfg.transition.duration).ease(d3$7[this.cfg.transition.ease]); // Word group selection data
 
     this.wordgroup = this.gcenter.selectAll(".chart__word-group").data(this.tData, d => d.text);
   }
@@ -2085,9 +2429,9 @@ class d3wordscloud extends d3chart {
 
   setScales() {
     if (this.cfg.color.scheme instanceof Array === true) {
-      this.colorScale = d3$6.scaleOrdinal().range(this.cfg.color.scheme);
+      this.colorScale = d3$7.scaleOrdinal().range(this.cfg.color.scheme);
     } else if (typeof this.cfg.color.scheme === 'string') {
-      this.colorScale = d3$6.scaleOrdinal(d3$6[this.cfg.color.scheme]);
+      this.colorScale = d3$7.scaleOrdinal(d3$7[this.cfg.color.scheme]);
     }
   }
   /**
@@ -2148,7 +2492,7 @@ class d3wordscloud extends d3chart {
 
 }
 
-var script$6 = {
+var script$7 = {
   name: 'D3WordsCloud',
   extends: __vue_component__,
 
@@ -2159,30 +2503,30 @@ var script$6 = {
 };
 
 /* script */
-const __vue_script__$6 = script$6;
+const __vue_script__$7 = script$7;
 /* template */
 
 /* style */
 
-const __vue_inject_styles__$6 = undefined;
+const __vue_inject_styles__$7 = undefined;
 /* scoped */
 
-const __vue_scope_id__$6 = undefined;
+const __vue_scope_id__$7 = undefined;
 /* module identifier */
 
-const __vue_module_identifier__$6 = undefined;
+const __vue_module_identifier__$7 = undefined;
 /* functional template */
 
-const __vue_is_functional_template__$6 = undefined;
+const __vue_is_functional_template__$7 = undefined;
 /* style inject */
 
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-const __vue_component__$6 = normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);
+const __vue_component__$7 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, undefined, undefined, undefined);
 
-const d3$7 = {
+const d3$8 = {
   select,
   selectAll,
   scaleLinear,
@@ -2285,10 +2629,10 @@ class d3sliceschart extends d3chart {
     // Set up dimensions
     this.getDimensions();
     this.initChartFrame('sliceschart');
-    this.cScale = d3$7.scaleOrdinal();
-    this.rScale = d3$7.scaleLinear();
-    this.arc = d3$7.arc();
-    this.pie = d3$7.pie().sort(null).value(() => 1).padAngle(this.cfg.radius.padding);
+    this.cScale = d3$8.scaleOrdinal();
+    this.rScale = d3$8.scaleLinear();
+    this.arc = d3$8.arc();
+    this.pie = d3$8.pie().sort(null).value(() => 1).padAngle(this.cfg.radius.padding);
 
     if (this.cfg.radius && this.cfg.radius.inner) {
       const outRadius = this.cfg.radius.outter ? this.cfg.radius.outter : Math.min(this.cfg.width, this.cfg.height) / 2;
@@ -2318,7 +2662,7 @@ class d3sliceschart extends d3chart {
   bindData() {
     this.itemg = this.gcenter.selectAll('.chart__slice-group').data(this.pie(this.data), d => d.data[this.cfg.key]); // Set transition
 
-    this.transition = d3$7.transition('t').duration(this.cfg.transition.duration).ease(d3$7[this.cfg.transition.ease]);
+    this.transition = d3$8.transition('t').duration(this.cfg.transition.duration).ease(d3$8[this.cfg.transition.ease]);
   }
   /**
   * Set up scales
@@ -2335,14 +2679,14 @@ class d3sliceschart extends d3chart {
     } // Set up arcs
 
 
-    this.arc = d3$7.arc().outerRadius(this.cfg.radius.outter).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
-    this.rScale.range([this.inRadius, this.cfg.radius.outter]).domain([0, d3$7.max(this.data, d => d[this.cfg.value])]); // Set up color scheme
+    this.arc = d3$8.arc().outerRadius(this.cfg.radius.outter).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
+    this.rScale.range([this.inRadius, this.cfg.radius.outter]).domain([0, d3$8.max(this.data, d => d[this.cfg.value])]); // Set up color scheme
 
     if (this.cfg.color.scheme) {
       if (this.cfg.color.scheme instanceof Array === true) {
-        this.colorScale = d3$7.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
+        this.colorScale = d3$8.scaleOrdinal().domain(this.data.map(d => d[this.cfg.key])).range(this.cfg.color.scheme);
       } else {
-        this.colorScale = d3$7.scaleOrdinal(d3$7[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
+        this.colorScale = d3$8.scaleOrdinal(d3$8[this.cfg.color.scheme]).domain(this.data.map(d => d[this.cfg.key]));
       }
     }
   }
@@ -2365,7 +2709,7 @@ class d3sliceschart extends d3chart {
     }).on('mousemove', () => {
       this.tooltip.style('left', window.event['pageX'] - 28 + 'px').style('top', window.event['pageY'] - 40 + 'px');
     }).transition(this.transition).delay((d, i) => i * this.cfg.transition.duration).attrTween('d', d => {
-      const i = d3$7.interpolate(d.startAngle + 0.1, d.endAngle);
+      const i = d3$8.interpolate(d.startAngle + 0.1, d.endAngle);
       return t => {
         d.endAngle = i(t);
         return this.arc(d);
@@ -2373,8 +2717,8 @@ class d3sliceschart extends d3chart {
     }).style("fill", d => this.cfg.color.default).style('opacity', 1); // FILLS
 
     newg.append("path").attr("class", "chart__slice chart__slice--sliceschart").transition(this.transition).delay((d, i) => i * this.cfg.transition.duration).attrTween('d', d => {
-      const i = d3$7.interpolate(d.startAngle + 0.1, d.endAngle);
-      const arc = d3$7.arc().outerRadius(this.rScale(d.data[this.cfg.value])).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
+      const i = d3$8.interpolate(d.startAngle + 0.1, d.endAngle);
+      const arc = d3$8.arc().outerRadius(this.rScale(d.data[this.cfg.value])).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
       return t => {
         d.endAngle = i(t);
         return arc(d);
@@ -2386,25 +2730,25 @@ class d3sliceschart extends d3chart {
   */
 
 
-  updateElements() {}
-  /*
-          // PATHS
-          this.itemg.selectAll(".chart__slice")
-              .style('opacity', 0)
-              .data(this.pie(this.data), d => d.data[this.cfg.key])
-              .transition(this.transition)
-              .delay((d,i) => i * this.cfg.transition.duration)
-              .attrTween('d', d => {
-                  const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
-                  return t => {
-                      d.endAngle = i(t); 
-                      return this.arc(d)
-                  }
-              })
-              .style("fill", this.cfg.color.default)
-              .style('opacity', 1);
-  */
-
+  updateElements() {
+    /*
+            // PATHS
+            this.itemg.selectAll(".chart__slice")
+                .style('opacity', 0)
+                .data(this.pie(this.data), d => d.data[this.cfg.key])
+                .transition(this.transition)
+                .delay((d,i) => i * this.cfg.transition.duration)
+                .attrTween('d', d => {
+                    const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+                    return t => {
+                        d.endAngle = i(t); 
+                        return this.arc(d)
+                    }
+                })
+                .style("fill", this.cfg.color.default)
+                .style('opacity', 1);
+    */
+  }
   /**
   * Remove chart's elements without data
   */
@@ -2425,14 +2769,14 @@ class d3sliceschart extends d3chart {
 
 
   arcTween(a) {
-    var i = d3$7.interpolate(this._current, a);
+    var i = d3$8.interpolate(this._current, a);
     this._current = i(0);
     return t => this.arc(i(t));
   }
 
 }
 
-var script$7 = {
+var script$8 = {
   name: 'D3SlicesChart',
   extends: __vue_component__,
 
@@ -2443,12 +2787,12 @@ var script$7 = {
 };
 
 /* script */
-const __vue_script__$7 = script$7;
+const __vue_script__$8 = script$8;
 /* template */
 
 /* style */
 
-const __vue_inject_styles__$7 = function (inject) {
+const __vue_inject_styles__$8 = function (inject) {
   if (!inject) return;
   inject("data-v-6a52c448_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}",
@@ -2459,18 +2803,18 @@ const __vue_inject_styles__$7 = function (inject) {
 /* scoped */
 
 
-const __vue_scope_id__$7 = undefined;
+const __vue_scope_id__$8 = undefined;
 /* module identifier */
 
-const __vue_module_identifier__$7 = undefined;
+const __vue_module_identifier__$8 = undefined;
 /* functional template */
 
-const __vue_is_functional_template__$7 = undefined;
+const __vue_is_functional_template__$8 = undefined;
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-const __vue_component__$7 = normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, createInjector, undefined, undefined);
+const __vue_component__$8 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, false, createInjector, undefined, undefined);
 
 /* eslint-disable import/prefer-default-export */
 
@@ -2478,11 +2822,12 @@ var components = /*#__PURE__*/Object.freeze({
   __proto__: null,
   D3BarChart: __vue_component__$1,
   D3LineChart: __vue_component__$2,
-  D3PieChart: __vue_component__$3,
-  D3SlopeChart: __vue_component__$4,
-  D3Sunburst: __vue_component__$5,
-  D3WordsCloud: __vue_component__$6,
-  D3SlicesChart: __vue_component__$7
+  D3AreaChart: __vue_component__$3,
+  D3PieChart: __vue_component__$4,
+  D3SlopeChart: __vue_component__$5,
+  D3Sunburst: __vue_component__$6,
+  D3WordsCloud: __vue_component__$7,
+  D3SlicesChart: __vue_component__$8
 });
 
 // Import vue components
@@ -2490,7 +2835,8 @@ var components = /*#__PURE__*/Object.freeze({
 const install = function installVueD3Charts(Vue) {
   if (install.installed) return;
   install.installed = true;
-  Object.entries(components).forEach(([componentName, component]) => {
+  Object.entries(components).forEach(_ref => {
+    let [componentName, component] = _ref;
     Vue.component(componentName, component);
   });
 }; // Create module definition for Vue.use()
@@ -2516,4 +2862,4 @@ if (GlobalVue) {
 } // Default export is library as a whole, registered via Vue.use()
 
 export default plugin;
-export { __vue_component__$1 as D3BarChart, __vue_component__$2 as D3LineChart, __vue_component__$3 as D3PieChart, __vue_component__$7 as D3SlicesChart, __vue_component__$4 as D3SlopeChart, __vue_component__$5 as D3Sunburst, __vue_component__$6 as D3WordsCloud };
+export { __vue_component__$3 as D3AreaChart, __vue_component__$1 as D3BarChart, __vue_component__$2 as D3LineChart, __vue_component__$4 as D3PieChart, __vue_component__$8 as D3SlicesChart, __vue_component__$5 as D3SlopeChart, __vue_component__$6 as D3Sunburst, __vue_component__$7 as D3WordsCloud };

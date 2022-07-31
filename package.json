@@ -11,6 +11,7 @@
     "src/**/*.vue"
   ],
   "scripts": {
+    "yalc": "yarn build && yarn build:ssr && yarn build:es && yarn build:unpkg && yalc publish",
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
