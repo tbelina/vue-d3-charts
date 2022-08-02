@@ -4,6 +4,7 @@ import {scaleOrdinal, scaleLinear, scaleTime} from 'd3-scale'
 import {timeParse, timeFormat} from 'd3-time-format'
 import {max, extent} from 'd3-array'
 import {line} from 'd3-shape'
+import { area } from 'd3-shape'
 import {transition} from 'd3-transition'
 import {axisLeft, axisBottom} from 'd3-axis'
 import {easeLinear, easePolyIn, easePolyOut, easePoly, easePolyInOut,
@@ -22,7 +23,7 @@ import {schemeCategory10, schemeAccent, schemeDark2, schemePaired,
   schemeTableau10} from 'd3-scale-chromatic'
 
 const d3 = { select, selectAll, scaleOrdinal, scaleLinear, scaleTime,
-  timeParse, timeFormat, max, extent, line, transition, axisLeft,
+  timeParse, timeFormat, max, extent, line, area, transition, axisLeft,
   axisBottom, easeLinear, easePolyIn, easePolyOut, easePoly, easePolyInOut,
   easeQuadIn, easeQuadOut, easeQuad, easeQuadInOut, easeCubicIn, easeCubicOut,
   easeCubic, easeCubicInOut, easeSinIn, easeSinOut, easeSin, easeSinInOut,
@@ -69,7 +70,8 @@ class d3areachart extends d3chart {
         // Init scales
         this.yScale = d3.scaleLinear();
         this.xScale = d3.scaleTime();
-        this.line = d3.line();
+        // this.line = d3.line();
+        this.areagen = d3.area();
 
         // Axis group
         this.axisg = this.g.append('g')
@@ -163,11 +165,12 @@ class d3areachart extends d3chart {
             this.colorScale = d3.scaleOrdinal(d3[this.cfg.color.scheme]);
         }
 
-        // Set up line function
-        this.line
-            .x(d => this.xScale(d.x))
-            .y(d => this.yScale(d.y))
-            .curve(d3[this.cfg.curve])
+        // Set up area function
+        this.areagen
+            .x((d,i) => { console.log('in_areagen: ', i, d, d.values.map(v => ({ y: 0, x: v.x, k: v.k })), this.xScale(d.values.x)); return this.xScale(d.values[i].x)})
+            // .x(d => this.xScale(d.values.x))
+            .y0((d,i)  => this.yScale(d.values[i].y+10))
+            .y1((d,i)  => this.yScale(d.values[i].y))
 
         // Redraw grid
         this.yGrid
@@ -191,88 +194,40 @@ class d3areachart extends d3chart {
      * Bind data to main elements groups
      */
     bindData() {
-
         // Set transition
         this.transition = d3.transition('t')
             .duration(this.cfg.transition.duration)
             .ease(d3[this.cfg.transition.ease]);
 
-        // Lines group
-        this.linesgroup = this.g.selectAll(".chart__lines-group")
-            .data(this.tData, d => d.key);
+        // Area group
+        this.multiareagroup = this.g.selectAll(".chart__multiarea-group")
+            .data(this.tData, d => d.key)
 
-        // Don't continue if points are disabled
-        if(this.cfg.points === false)
-          return;
+        this.areagroup =  this.multiareagroup.selectAll(".chart__area-group")
+            .data(function(d) { console.log('d', d); return d; })            
         
-        // Set points store
-        if (!this.pointsg || this.pointsg instanceof Array === false) {
-            this.pointsg = [];
-        }
+        console.log("multiareagroup", this.multiareagroup)
+        console.log("areagroup", this.areagroup)
+
     }
 
     /**
      * Add new chart's elements
      */
     enterElements() {
-
-        // Elements to add
-        const newgroups = this.linesgroup
+        // // Elements to add
+        const newmultiareagroups = this.multiareagroup
             .enter().append('g')
-            .attr("class", "chart__lines-group chart__lines-group--areachart");
+            .attr("class", "chart__multiarea-group chart__multiarea-group--areachart");
 
-        // Lines
-        newgroups.append('path')
-            .attr("class", "chart__line chart__line--areachart")
-            .attr('fill', 'transparent')
-            .attr("d", d => this.line(
-                d.values.map(v => ({ y: 0, x: v.x, k: v.k }))
-            ));
+        const newareagroups = newmultiareagroups.enter()
+            .append('path')
+            .data(this.tData)
+            .attr("class", "chart__area-group chart__area-group--areachart")
+            .attr('fill', 'steelblue')
+            .attr("d", this.areagen);
 
-        // Don't continue if points are disabled
-        if(this.cfg.points === false)
-          return;
-
-        this.cfg.values.forEach((k, i) => {
-            // Point group
-            let gp = this.g.selectAll('.chart__points-group--' + k)
-                .data(this.data).enter()
-                .append('g')
-                .attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + k)
-                .attr('transform', d => `translate(${this.xScale(d.jsdate)},${this.cfg.height})`)
-
-            // Hover point
-            gp.append('circle')
-                .attr('class', 'chart__point-hover chart__point-hover--areachart')
-                .attr('fill', 'transparent')
-                .attr('r', this.cfg.points.hoverSize)
-                .on('mouseover', (d, j) => {
-                    this.tooltip.html(_ => {
-                            const label = this.cfg.tooltip.labels && this.cfg.tooltip.labels[i]
-                                ? this.cfg.tooltip.labels[i]
-                                : k;
-                            return `
-                            <div>${label}: ${this.tData[i].values[j].y}</div>
-                        `
-                        })
-                        .classed('active', true);
-                })
-                .on('mouseout', _ => {
-                    this.tooltip.classed('active', false)
-                })
-                .on('mousemove', _ => {
-                    this.tooltip
-                        .style('left', window.event['pageX'] - 28 + 'px')
-                        .style('top', window.event['pageY'] - 40 + 'px')
-                })
-
-            // Visible point
-            gp.append('circle')
-                .attr('class', 'chart__point-visible chart__point-visible--areachart')
-                .attr('pointer-events', 'none');
-
-            this.pointsg.push({ selection: gp, key: k })
-        })
+        // console.log('newareagroups', newareagroups)
     }
 
     /**
@@ -280,45 +235,16 @@ class d3areachart extends d3chart {
      */
     updateElements() {
 
-        // Color lines
-        this.linesgroup
-            .attr('stroke', d => this.colorElement(d, 'key'))
-
-        // Redraw lines
-        this.g.selectAll('.chart__line')
-            .attr('stroke', d => this.colorElement(d, 'key'))
-            .transition(this.transition)
-            .attr("d", (d, i) => this.line(this.tData[i].values));
-
-        // Don't continue if points are disabled
-        if(this.cfg.points===false)
-          return;
-
-        // Redraw points
-        this.pointsg.forEach((p, i) => {
-            p.selection
-                .transition(this.transition)
-                .attr('transform', d => `translate(${this.xScale(d.jsdate)},${this.yScale(d[p.key])})`)
-
-            // Visible point
-            p.selection.selectAll('.chart__point-visible')
-                .attr('fill', d => this.colorElement(p, 'key'))
-                .attr('r', this.cfg.points.visibleSize)
-            
-            // Hover point
-            p.selection.selectAll('.chart__point-hover')
-                .attr('r', this.cfg.points.hoverSize)
-        })
     }
 
     /**
      * Remove chart's elements without data
      */
     exitElements() {
-        this.linesgroup.exit()
+        this.multiareagroup.exit()
             .transition(this.transition)
             .style("opacity", 0)
-            .remove();
+            .remove();            
     }
 
 }
