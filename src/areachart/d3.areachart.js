@@ -73,6 +73,8 @@ class d3areachart extends d3chart {
         // this.line = d3.line();
         this.areagen = d3.area();
 
+        console.log(this.areagen)
+
         // Axis group
         this.axisg = this.g.append('g')
             .attr('class', 'chart__axis chart__axis--areachart')
@@ -165,12 +167,13 @@ class d3areachart extends d3chart {
             this.colorScale = d3.scaleOrdinal(d3[this.cfg.color.scheme]);
         }
 
+        const xs = this.xScale
+        const ys = this.yScale
         // Set up area function
         this.areagen
-            .x((d,i) => { console.log('in_areagen: ', i, d, d.values.map(v => ({ y: 0, x: v.x, k: v.k })), this.xScale(d.values.x)); return this.xScale(d.values[i].x)})
-            // .x(d => this.xScale(d.values.x))
-            .y0((d,i)  => this.yScale(d.values[i].y+10))
-            .y1((d,i)  => this.yScale(d.values[i].y))
+            .x( d =>  { console.log(d.x, xs(d.x)); return xs(d.x) })
+            .y0( d => ys(0))
+            .y1( d => ys(d.y))
 
         // Redraw grid
         this.yGrid
@@ -200,34 +203,24 @@ class d3areachart extends d3chart {
             .ease(d3[this.cfg.transition.ease]);
 
         // Area group
-        this.multiareagroup = this.g.selectAll(".chart__multiarea-group")
+        this.source = this.g.selectAll(".chart__multiarea-group")
             .data(this.tData, d => d.key)
-
-        this.areagroup =  this.multiareagroup.selectAll(".chart__area-group")
-            .data(function(d) { console.log('d', d); return d; })            
-        
-        console.log("multiareagroup", this.multiareagroup)
-        console.log("areagroup", this.areagroup)
-
     }
 
     /**
      * Add new chart's elements
      */
-    enterElements() {
-        // // Elements to add
-        const newmultiareagroups = this.multiareagroup
-            .enter().append('g')
-            .attr("class", "chart__multiarea-group chart__multiarea-group--areachart");
+    enterElements() {        
+        // Elements to add
+        const esource = this.source
+                            .enter().append('g')
+                            .attr("class", function(d) { return `chart__multiarea-group chart__multiarea-group--areachart chart__${d}-group`; })
 
-        const newareagroups = newmultiareagroups.enter()
-            .append('path')
-            .data(this.tData)
+        // avoid this scope problems
+        const ag = this.areagen
+        esource.append('path')
             .attr("class", "chart__area-group chart__area-group--areachart")
-            .attr('fill', 'steelblue')
-            .attr("d", this.areagen);
-
-        // console.log('newareagroups', newareagroups)
+            .attr("d", function(d) { return ag(d.values); })
     }
 
     /**
@@ -241,7 +234,7 @@ class d3areachart extends d3chart {
      * Remove chart's elements without data
      */
     exitElements() {
-        this.multiareagroup.exit()
+        this.source.exit()
             .transition(this.transition)
             .style("opacity", 0)
             .remove();            
