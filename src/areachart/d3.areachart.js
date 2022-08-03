@@ -44,6 +44,7 @@ class d3areachart extends d3chart {
         super(selection, data, config, {
             margin: { top: 20, right: 20, bottom: 20, left: 40 },
             values: [],
+            areas: {},
             date: { key: false, inputFormat: "%Y-%m-%d", outputFormat: "%Y-%m-%d" },
             color: { key: false, keys: false, scheme: false, current: '#1f77b4', default: '#AAA', axis: '#000' },
             curve: 'curveLinear',
