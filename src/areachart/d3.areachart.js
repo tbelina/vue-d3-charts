@@ -73,8 +73,6 @@ class d3areachart extends d3chart {
         // this.line = d3.line();
         this.areagen = d3.area();
 
-        console.log(this.areagen)
-
         // Axis group
         this.axisg = this.g.append('g')
             .attr('class', 'chart__axis chart__axis--areachart')
@@ -171,7 +169,7 @@ class d3areachart extends d3chart {
         const ys = this.yScale
         // Set up area function
         this.areagen
-            .x( d =>  { console.log(d.x, xs(d.x)); return xs(d.x) })
+            .x( d =>  xs(d.x))
             .y0( d => ys(0))
             .y1( d => ys(d.y))
 
