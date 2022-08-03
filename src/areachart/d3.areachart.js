@@ -214,12 +214,12 @@ class d3areachart extends d3chart {
         // Elements to add
         const esource = this.source
                             .enter().append('g')
-                            .attr("class", function(d) { return `chart__multiarea-group chart__multiarea-group--areachart chart__${d}-group`; })
+                            .attr("class", function(d) { return `chart__multiarea-group chart__multiarea-group--areachart chart__${d.key}-group`; })
 
         // avoid this scope problems
         const ag = this.areagen
         esource.append('path')
-            .attr("class", "chart__area-group chart__area-group--areachart")
+            .attr("class", "chart__area chart__area--areachart")
             .attr("d", function(d) { return ag(d.values); })
     }
 
@@ -227,7 +227,11 @@ class d3areachart extends d3chart {
      * Update chart's elements based on data change
      */
     updateElements() {
-
+        // avoid this scope problems
+        const ag = this.areagen
+        this.g.selectAll('.chart__area')
+            .transition(this.transition)
+            .attr("d", (d, i) => ag(this.tData[i].values));
     }
 
     /**
