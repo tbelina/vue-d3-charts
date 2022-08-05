@@ -3,8 +3,7 @@ import {select, selectAll} from 'd3-selection'
 import {scaleOrdinal, scaleLinear, scaleTime} from 'd3-scale'
 import {timeParse, timeFormat} from 'd3-time-format'
 import {max, extent} from 'd3-array'
-import {line} from 'd3-shape'
-import { area } from 'd3-shape'
+import {line, area} from 'd3-shape'
 import {transition} from 'd3-transition'
 import {axisLeft, axisBottom} from 'd3-axis'
 import {easeLinear, easePolyIn, easePolyOut, easePoly, easePolyInOut,
@@ -48,6 +47,7 @@ class d3areachart extends d3chart {
             date: { key: false, inputFormat: "%Y-%m-%d", outputFormat: "%Y-%m-%d" },
             color: { key: false, keys: false, scheme: false, current: '#1f77b4', default: '#AAA', axis: '#000' },
             curve: 'curveLinear',
+            areacurve: 'curveBasis',
             points: { visibleSize: 3, hoverSize: 6 },
             axis: { yTitle: false, xTitle: false, yFormat: ".0f", xFormat: "%Y-%m-%d", yTicks: 5, xTicks: 3 },
             tooltip: { labels: false },
@@ -73,6 +73,7 @@ class d3areachart extends d3chart {
         this.xScale = d3.scaleTime();
         // this.line = d3.line();
         this.areagen = d3.area();
+        this.line = d3.line();
 
         // Axis group
         this.axisg = this.g.append('g')
@@ -116,15 +117,26 @@ class d3areachart extends d3chart {
         this.data.forEach(d => { d.jsdate = this.parseTime(d[this.cfg.date.key]) });
         this.data.sort((a, b) => a.jsdate - b.jsdate);
 
+
         this.data.forEach((d, c) => {
             d.min = 9999999999999999999;
-            d.max = -9999999999999999999;
+            d.max = -9999999999999999999;          
             this.cfg.values.forEach((j, i) => {
-                tData[i].values.push({ x: d.jsdate, y: +d[j], k: i })
-                if (d[j] < d.min) d.min = +d[j];
-                if (d[j] > d.max) d.max = +d[j];
+                let jyl_cn = this.cfg.areas[j].lower
+                let jyu_cn = this.cfg.areas[j].upper
+                let jyo_cn = this.cfg.areas[j].observed                  
+                tData[i].values.push({ 
+                    x: d.jsdate,
+                    y: +d[j],
+                    y0: +d[jyl_cn],
+                    y1: +d[jyu_cn],
+                    yo: +d[jyo_cn],
+                    k: i })
+                if (d[j] < d.min) d.min = +d[jyl_cn];
+                if (d[j] > d.max) d.max = +d[jyu_cn];
             })
         });
+        console.log(tData)
         this.tData = tData;
     }
 
@@ -166,13 +178,18 @@ class d3areachart extends d3chart {
             this.colorScale = d3.scaleOrdinal(d3[this.cfg.color.scheme]);
         }
 
-        const xs = this.xScale
-        const ys = this.yScale
         // Set up area function
         this.areagen
-            .x( d =>  xs(d.x))
-            .y0( d => ys(0))
-            .y1( d => ys(d.y))
+            .x( (d, i) =>  this.xScale(d.x))
+            .y0( (d, i) => this.yScale(d.y0))
+            .y1( (d, i) => this.yScale(d.y1))
+            .curve(d3[this.cfg.areacurve])
+
+        // Set up line function
+        this.line
+            .x(d => this.xScale(d.x))
+            .y(d => this.yScale(d.y))
+            .curve(d3[this.cfg.curve])            
 
         // Redraw grid
         this.yGrid
@@ -204,6 +221,11 @@ class d3areachart extends d3chart {
         // Area group
         this.source = this.g.selectAll(".chart__multiarea-group")
             .data(this.tData, d => d.key)
+
+        // Lines group
+        this.linesgroup = this.g.selectAll(".chart__lines-group")
+            .data(this.tData, d => d.key);
+
     }
 
     /**
@@ -213,24 +235,49 @@ class d3areachart extends d3chart {
         // Elements to add
         const esource = this.source
                             .enter().append('g')
-                            .attr("class", function(d) { return `chart__multiarea-group chart__multiarea-group--areachart chart__${d.key}-group`; })
+                            .attr("class", function(d) { return `chart__multiarea-group chart__${d.key}-group chart__multiarea-group--areachart`; })
 
-        // avoid this scope problems
+        // avoid scope problems
         const ag = this.areagen
         esource.append('path')
-            .attr("class", "chart__area chart__area--areachart")
+            .attr("class", `chart__area chart__area--areachart`)
+            .attr('fill-opacity', '0.3')
             .attr("d", function(d) { return ag(d.values); })
+
+        // Elements to add
+        const newlinegroup = this.linesgroup
+            .enter().append('g')
+            .attr("class", "chart__lines-group chart__lines-group--areachart");
+
+        // Lines
+        newlinegroup.append('path')
+            .attr("class", "chart__line chart__line--areachart")
+            .attr('fill', 'transparent')
+            .attr("d", d => this.line(
+                d.values.map(v => ({ y: 0, x: v.x, k: v.k }))
+            ));         
     }
 
     /**
      * Update chart's elements based on data change
      */
     updateElements() {
-        // avoid this scope problems
+        // avoid scope problems
         const ag = this.areagen
         this.g.selectAll('.chart__area')
             .transition(this.transition)
+            .attr('fill', d => this.colorElement(d, 'key'))
             .attr("d", (d, i) => ag(this.tData[i].values));
+
+        // Color lines
+        this.linesgroup
+            .attr('stroke', d => this.colorElement(d, 'key'))
+
+        // Redraw lines
+        this.g.selectAll('.chart__line')
+            .attr('stroke', d => this.colorElement(d, 'key'))
+            .transition(this.transition)
+            .attr("d", (d, i) => this.line(this.tData[i].values));            
     }
 
     /**
