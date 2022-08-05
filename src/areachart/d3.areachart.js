@@ -136,7 +136,6 @@ class d3areachart extends d3chart {
                 if (d[j] > d.max) d.max = +d[jyu_cn];
             })
         });
-        console.log(tData)
         this.tData = tData;
     }
 
@@ -226,6 +225,11 @@ class d3areachart extends d3chart {
         this.linesgroup = this.g.selectAll(".chart__lines-group")
             .data(this.tData, d => d.key);
 
+        // Set points store
+        if (!this.pointsg || this.pointsg instanceof Array === false) {
+            this.pointsg = [];
+        }
+
     }
 
     /**
@@ -255,7 +259,28 @@ class d3areachart extends d3chart {
             .attr('fill', 'transparent')
             .attr("d", d => this.line(
                 d.values.map(v => ({ y: 0, x: v.x, k: v.k }))
-            ));         
+            ));
+            
+        // Don't continue if points are disabled
+        if(this.cfg.points === false)
+          return;
+
+        let ck = this.cfg.points.colKey
+        this.cfg.values.forEach((k, i) => {
+            // Point group
+            let gp = this.g.selectAll('.chart__points-group--' + ck)
+                .data(this.data).enter()
+                .append('g')
+                .attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + ck )
+                .attr('transform', d => `translate(${this.xScale(d.jsdate)},${this.cfg.height})`)
+
+            // Visible point
+            gp.append('circle')
+                .attr('class', 'chart__point-visible chart__point-visible--areachart')
+                .attr('pointer-events', 'none');
+
+            this.pointsg.push({ selection: gp, key: ck})
+        })            
     }
 
     /**
@@ -277,7 +302,31 @@ class d3areachart extends d3chart {
         this.g.selectAll('.chart__line')
             .attr('stroke', d => this.colorElement(d, 'key'))
             .transition(this.transition)
-            .attr("d", (d, i) => this.line(this.tData[i].values));            
+            .attr("d", (d, i) => this.line(this.tData[i].values));
+            
+        // Redraw points
+        this.pointsg.forEach((p, i) => {
+            p.selection
+                .transition(this.transition)
+                .attr('transform', d => {
+                    if (d[p.key]) {
+                        return `translate(${this.xScale(d.jsdate)},${this.yScale(d[p.key])})`
+                    } else {
+                        return `translate(${this.xScale(d.jsdate)},${this.yScale(0)})`
+                    }
+                })
+
+            // Visible point
+            p.selection.selectAll('.chart__point-visible')
+                .attr('fill', d => this.colorElement(p, 'points'))
+                .attr('r', d => {
+                    if (d[p.key]) {
+                        return this.cfg.points.visibleSize
+                    } else {
+                        return 0
+                    }
+                })
+        })            
     }
 
     /**
