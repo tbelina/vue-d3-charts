@@ -352,8 +352,16 @@ class d3chart {
 
 
   getDimensions() {
-    this.cfg.width = parseInt(this.selection.node().offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
-    this.cfg.height = parseInt(this.selection.node().offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+    const width = parseInt(this.selection.node().offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
+    const height = parseInt(this.selection.node().offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+
+    if (this.cfg.fixedSize && width === 0) {
+      console.info("Fixed size set - getDimensions skipped");
+    } else {
+      this.cfg.width = width;
+      this.cfg.height = height;
+      console.info("Fixed size no set. Calculated dimensions:", this.cfg.width, this.cfg.height);
+    }
   }
   /**
   * Returns chart's data
