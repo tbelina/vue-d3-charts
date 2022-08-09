@@ -136,6 +136,8 @@ class d3areachart extends d3chart {
                 if (d[j] > d.max) d.max = +d[jyu_cn];
             })
         });
+        // console.log('data', this.data)
+        // console.log('tdata', tData)
         this.tData = tData;
     }
 
@@ -162,7 +164,6 @@ class d3areachart extends d3chart {
      */
     setScales() {
         // Calcule vertical scale
-        console.log(this.data)
         this.yScale
             .domain([d3.min(this.data, d => d.min), d3.max(this.data, d => d.max)])
             .rangeRound([this.cfg.height, 0]);

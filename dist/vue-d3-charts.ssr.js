@@ -1419,8 +1419,10 @@ var __vue_component__$2 = /*#__PURE__*/normalizeComponent({}, __vue_inject_style
   timeParse: d3TimeFormat.timeParse,
   timeFormat: d3TimeFormat.timeFormat,
   max: d3Array.max,
+  min: d3Array.min,
   extent: d3Array.extent,
   line: d3Shape.line,
+  area: d3Shape.area,
   transition: d3Transition.transition,
   axisLeft: d3Axis.axisLeft,
   axisBottom: d3Axis.axisBottom,
@@ -1503,6 +1505,7 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
         left: 40
       },
       values: [],
+      areas: {},
       date: {
         key: false,
         inputFormat: "%Y-%m-%d",
@@ -1516,7 +1519,8 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
         default: '#AAA',
         axis: '#000'
       },
-      curve: 'curveLinear',
+      curve: 'curveBasis',
+      areacurve: 'curveBasis',
       points: {
         visibleSize: 3,
         hoverSize: 6
@@ -1554,7 +1558,9 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
       this.formatTime = d3$3.timeFormat(this.cfg.date.outputFormat); // Init scales
 
       this.yScale = d3$3.scaleLinear();
-      this.xScale = d3$3.scaleTime();
+      this.xScale = d3$3.scaleTime(); // this.line = d3.line();
+
+      this.areagen = d3$3.area();
       this.line = d3$3.line(); // Axis group
 
       this.axisg = this.g.append('g').attr('class', 'chart__axis chart__axis--areachart'); // Horizontal grid
@@ -1596,15 +1602,23 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
         d.max = -9999999999999999999;
 
         _this.cfg.values.forEach(function (j, i) {
+          var jyl_cn = _this.cfg.areas[j].lower;
+          var jyu_cn = _this.cfg.areas[j].upper;
+          var jyo_cn = _this.cfg.areas[j].observed;
           tData[i].values.push({
             x: d.jsdate,
             y: +d[j],
+            y0: +d[jyl_cn],
+            y1: +d[jyu_cn],
+            yo: +d[jyo_cn],
             k: i
           });
-          if (d[j] < d.min) d.min = +d[j];
-          if (d[j] > d.max) d.max = +d[j];
+          if (d[j] < d.min) d.min = +d[jyl_cn];
+          if (d[j] > d.max) d.max = +d[jyu_cn];
         });
-      });
+      }); // console.log('data', this.data)
+      // console.log('tdata', tData)
+
       this.tData = tData;
     }
     /**
@@ -1629,7 +1643,9 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
       var _this2 = this;
 
       // Calcule vertical scale
-      this.yScale.domain([0, d3$3.max(this.data, function (d) {
+      this.yScale.domain([d3$3.min(this.data, function (d) {
+        return d.min;
+      }), d3$3.max(this.data, function (d) {
         return d.max;
       })]).rangeRound([this.cfg.height, 0]); // Calcule horizontal scale
 
@@ -1641,8 +1657,16 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
         this.colorScale = d3$3.scaleOrdinal().range(this.cfg.color.scheme);
       } else if (typeof this.cfg.color.scheme === 'string') {
         this.colorScale = d3$3.scaleOrdinal(d3$3[this.cfg.color.scheme]);
-      } // Set up line function
+      } // Set up area function
 
+
+      this.areagen.x(function (d, i) {
+        return _this2.xScale(d.x);
+      }).y0(function (d, i) {
+        return _this2.yScale(d.y0);
+      }).y1(function (d, i) {
+        return _this2.yScale(d.y1);
+      }).curve(d3$3[this.cfg.areacurve]); // Set up line function
 
       this.line.x(function (d) {
         return _this2.xScale(d.x);
@@ -1662,13 +1686,15 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
     key: "bindData",
     value: function bindData() {
       // Set transition
-      this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]); // Lines group
+      this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]); // Area group
+
+      this.source = this.g.selectAll(".chart__multiarea-group").data(this.tData, function (d) {
+        return d.key;
+      }); // Lines group
 
       this.linesgroup = this.g.selectAll(".chart__lines-group").data(this.tData, function (d) {
         return d.key;
-      }); // Don't continue if points are disabled
-
-      if (this.cfg.points === false) return; // Set points store
+      }); // Set points store
 
       if (!this.pointsg || this.pointsg instanceof Array === false) {
         this.pointsg = [];
@@ -1684,9 +1710,18 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
       var _this3 = this;
 
       // Elements to add
-      var newgroups = this.linesgroup.enter().append('g').attr("class", "chart__lines-group chart__lines-group--areachart"); // Lines
+      var esource = this.source.enter().append('g').attr("class", function (d) {
+        return "chart__multiarea-group chart__".concat(d.key, "-group chart__multiarea-group--areachart");
+      }); // avoid scope problems
 
-      newgroups.append('path').attr("class", "chart__line chart__line--areachart").attr('fill', 'transparent').attr("d", function (d) {
+      var ag = this.areagen;
+      esource.append('path').attr("class", "chart__area chart__area--areachart").attr('fill-opacity', '0.3').attr("d", function (d) {
+        return ag(d.values);
+      }); // Elements to add
+
+      var newlinegroup = this.linesgroup.enter().append('g').attr("class", "chart__lines-group chart__lines-group--areachart"); // Lines
+
+      newlinegroup.append('path').attr("class", "chart__line chart__line--areachart").attr('fill', 'transparent').attr("d", function (d) {
         return _this3.line(d.values.map(function (v) {
           return {
             y: 0,
@@ -1697,29 +1732,19 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
       }); // Don't continue if points are disabled
 
       if (this.cfg.points === false) return;
+      var ck = this.cfg.points.colKey;
       this.cfg.values.forEach(function (k, i) {
         // Point group
-        var gp = _this3.g.selectAll('.chart__points-group--' + k).data(_this3.data).enter().append('g').attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + k).attr('transform', function (d) {
+        var gp = _this3.g.selectAll('.chart__points-group--' + ck).data(_this3.data).enter().append('g').attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + ck).attr('transform', function (d) {
           return "translate(".concat(_this3.xScale(d.jsdate), ",").concat(_this3.cfg.height, ")");
-        }); // Hover point
-
-
-        gp.append('circle').attr('class', 'chart__point-hover chart__point-hover--areachart').attr('fill', 'transparent').attr('r', _this3.cfg.points.hoverSize).on('mouseover', function (d, j) {
-          _this3.tooltip.html(function (_) {
-            var label = _this3.cfg.tooltip.labels && _this3.cfg.tooltip.labels[i] ? _this3.cfg.tooltip.labels[i] : k;
-            return "\n                            <div>".concat(label, ": ").concat(_this3.tData[i].values[j].y, "</div>\n                        ");
-          }).classed('active', true);
-        }).on('mouseout', function (_) {
-          _this3.tooltip.classed('active', false);
-        }).on('mousemove', function (_) {
-          _this3.tooltip.style('left', window.event['pageX'] - 28 + 'px').style('top', window.event['pageY'] - 40 + 'px');
         }); // Visible point
+
 
         gp.append('circle').attr('class', 'chart__point-visible chart__point-visible--areachart').attr('pointer-events', 'none');
 
         _this3.pointsg.push({
           selection: gp,
-          key: k
+          key: ck
         });
       });
     }
@@ -1732,7 +1757,14 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
     value: function updateElements() {
       var _this4 = this;
 
-      // Color lines
+      // avoid scope problems
+      var ag = this.areagen;
+      this.g.selectAll('.chart__area').transition(this.transition).attr('fill', function (d) {
+        return _this4.colorElement(d, 'key');
+      }).attr("d", function (d, i) {
+        return ag(_this4.tData[i].values);
+      }); // Color lines
+
       this.linesgroup.attr('stroke', function (d) {
         return _this4.colorElement(d, 'key');
       }); // Redraw lines
@@ -1741,20 +1773,26 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
         return _this4.colorElement(d, 'key');
       }).transition(this.transition).attr("d", function (d, i) {
         return _this4.line(_this4.tData[i].values);
-      }); // Don't continue if points are disabled
-
-      if (this.cfg.points === false) return; // Redraw points
+      }); // Redraw points
 
       this.pointsg.forEach(function (p, i) {
         p.selection.transition(_this4.transition).attr('transform', function (d) {
-          return "translate(".concat(_this4.xScale(d.jsdate), ",").concat(_this4.yScale(d[p.key]), ")");
+          if (d[p.key]) {
+            return "translate(".concat(_this4.xScale(d.jsdate), ",").concat(_this4.yScale(d[p.key]), ")");
+          } else {
+            return "translate(".concat(_this4.xScale(d.jsdate), ",").concat(_this4.yScale(0), ")");
+          }
         }); // Visible point
 
         p.selection.selectAll('.chart__point-visible').attr('fill', function (d) {
-          return _this4.colorElement(p, 'key');
-        }).attr('r', _this4.cfg.points.visibleSize); // Hover point
-
-        p.selection.selectAll('.chart__point-hover').attr('r', _this4.cfg.points.hoverSize);
+          return _this4.colorElement(p, 'points');
+        }).attr('r', function (d) {
+          if (d[p.key]) {
+            return _this4.cfg.points.visibleSize;
+          } else {
+            return 0;
+          }
+        });
       });
     }
     /**
@@ -1764,7 +1802,7 @@ var d3areachart = /*#__PURE__*/function (_d3chart) {
   }, {
     key: "exitElements",
     value: function exitElements() {
-      this.linesgroup.exit().transition(this.transition).style("opacity", 0).remove();
+      this.source.exit().transition(this.transition).style("opacity", 0).remove();
     }
   }]);
 
