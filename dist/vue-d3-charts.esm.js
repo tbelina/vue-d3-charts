@@ -50,6 +50,10 @@ var script = {
     height: {
       type: [Number, String],
       default: 300
+    },
+    isHidden: {
+      type: Function,
+      required: false
     }
   },
   watch: {
@@ -231,7 +235,7 @@ var __vue_staticRenderFns__ = [];
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-52bb9522_0", {
+  inject("data-v-364e5dea_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}",
     map: undefined,
     media: undefined
@@ -352,15 +356,31 @@ class d3chart {
 
 
   getDimensions() {
-    const width = parseInt(this.selection.node().offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
-    const height = parseInt(this.selection.node().offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+    function isHidden(node) {
+      var _node$parentElement, _node$parentElement$p, _node$parentElement$p2, _node$parentElement$p3;
 
-    if (this.cfg.fixedSize && width === 0) {
-      console.info("Fixed size set - getDimensions skipped");
-    } else {
+      const root = node === null || node === void 0 ? void 0 : (_node$parentElement = node.parentElement) === null || _node$parentElement === void 0 ? void 0 : (_node$parentElement$p = _node$parentElement.parentElement) === null || _node$parentElement$p === void 0 ? void 0 : (_node$parentElement$p2 = _node$parentElement$p.parentElement) === null || _node$parentElement$p2 === void 0 ? void 0 : (_node$parentElement$p3 = _node$parentElement$p2.parentElement) === null || _node$parentElement$p3 === void 0 ? void 0 : _node$parentElement$p3.parentElement;
+
+      if (root) {
+        const display = window.getComputedStyle(root).display;
+        return display === 'none';
+      } else {
+        return false;
+      }
+    }
+
+    const node = this.selection.node();
+    const width = parseInt(node.offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
+    const height = parseInt(node.offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+
+    if (this.cfg.width === undefined) {
       this.cfg.width = width;
       this.cfg.height = height;
-      console.info("Fixed size no set. Calculated dimensions:", this.cfg.width, this.cfg.height);
+      console.debug("Dimensions was undefined - current dimensions:", this.cfg.width, this.cfg.height);
+    } else if (!isHidden(node)) {
+      this.cfg.width = width;
+      this.cfg.height = height;
+      console.debug("Element is visible, calculated dimensions:", this.cfg.width, this.cfg.height);
     }
   }
   /**

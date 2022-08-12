@@ -37,6 +37,10 @@ export default {
       type: [Number, String],
       default: 300,
     },
+    isHidden: {
+      type: Function,
+      required: false
+    }
   },
   watch: {
     config: {

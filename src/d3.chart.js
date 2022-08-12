@@ -84,15 +84,26 @@ class d3chart {
     * Set up chart dimensions
     */
     getDimensions(){
-        const width = parseInt(this.selection.node().offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
-        const height = parseInt(this.selection.node().offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
-
-        if(this.cfg.fixedSize && width === 0) {
-            console.info("Fixed size set - getDimensions skipped")
-        }else{
+        function isHidden(node) {
+            const root = node?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement
+            if (root) {
+                const display = window.getComputedStyle(root).display;
+                return display === 'none';
+            } else {
+                return false
+            }
+        }
+        const node = this.selection.node();
+        const width = parseInt(node.offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
+        const height = parseInt(node.offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+        if(this.cfg.width === undefined) {
             this.cfg.width = width
             this.cfg.height = height
-            console.info("Fixed size no set. Calculated dimensions:", this.cfg.width, this.cfg.height)
+            console.debug("Dimensions was undefined - current dimensions:", this.cfg.width, this.cfg.height)
+        } else if(!isHidden(node)){
+            this.cfg.width = width
+            this.cfg.height = height
+            console.debug("Element is visible, calculated dimensions:", this.cfg.width, this.cfg.height)
         }
     }
 
