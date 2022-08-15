@@ -2,7 +2,7 @@ import d3chart from '../d3.chart'
 import {select, selectAll} from 'd3-selection'
 import {scaleOrdinal, scaleLinear, scaleTime} from 'd3-scale'
 import {timeParse, timeFormat} from 'd3-time-format'
-import {max, extent} from 'd3-array'
+import {max, min, extent} from 'd3-array'
 import {line} from 'd3-shape'
 import {transition} from 'd3-transition'
 import {axisLeft, axisBottom} from 'd3-axis'
@@ -22,7 +22,7 @@ import {schemeCategory10, schemeAccent, schemeDark2, schemePaired,
   schemeTableau10} from 'd3-scale-chromatic'
 
 const d3 = { select, selectAll, scaleOrdinal, scaleLinear, scaleTime,
-  timeParse, timeFormat, max, extent, line, transition, axisLeft,
+  timeParse, timeFormat, max, min, extent, line, transition, axisLeft,
   axisBottom, easeLinear, easePolyIn, easePolyOut, easePoly, easePolyInOut,
   easeQuadIn, easeQuadOut, easeQuad, easeQuadInOut, easeCubicIn, easeCubicOut,
   easeCubic, easeCubicInOut, easeSinIn, easeSinOut, easeSin, easeSinInOut,
@@ -149,7 +149,7 @@ class d3linechart extends d3chart {
     setScales() {
         // Calcule vertical scale
         this.yScale
-            .domain([0, d3.max(this.data, d => d.max)])
+            .domain([d3.min(this.data, d => d.min), d3.max(this.data, d => d.max)])
             .rangeRound([this.cfg.height, 0]);
 
         // Calcule horizontal scale
