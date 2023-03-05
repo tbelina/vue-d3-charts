@@ -1,17 +1,37 @@
-'use strict';Object.defineProperty(exports,'__esModule',{value:true});var d3Selection=require('d3-selection'),d3Scale=require('d3-scale'),d3Array=require('d3-array'),d3Transition=require('d3-transition'),d3Axis=require('d3-axis'),d3Ease=require('d3-ease'),d3ScaleChromatic=require('d3-scale-chromatic'),d3TimeFormat=require('d3-time-format'),d3Shape=require('d3-shape'),d3Interpolate=require('d3-interpolate'),d3Hierarchy=require('d3-hierarchy'),cloud=require('d3-cloud');function _typeof(obj) {
-  "@babel/helpers - typeof";
+'use strict';Object.defineProperty(exports,'__esModule',{value:true});var d3Selection=require('d3-selection'),d3Scale=require('d3-scale'),d3Array=require('d3-array'),d3Transition=require('d3-transition'),d3Axis=require('d3-axis'),d3Ease=require('d3-ease'),d3ScaleChromatic=require('d3-scale-chromatic'),d3TimeFormat=require('d3-time-format'),d3Shape=require('d3-shape'),d3Interpolate=require('d3-interpolate'),d3Hierarchy=require('d3-hierarchy'),cloud=require('d3-cloud');function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
 
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
   }
 
-  return _typeof(obj);
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
+  }
+
+  return target;
+}
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
 }
 
 function _classCallCheck(instance, Constructor) {
@@ -33,6 +53,9 @@ function _defineProperties(target, props) {
 function _createClass(Constructor, protoProps, staticProps) {
   if (protoProps) _defineProperties(Constructor.prototype, protoProps);
   if (staticProps) _defineProperties(Constructor, staticProps);
+  Object.defineProperty(Constructor, "prototype", {
+    writable: false
+  });
   return Constructor;
 }
 
@@ -51,40 +74,6 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    if (enumerableOnly) symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    });
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
-  }
-
-  return target;
-}
-
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
@@ -97,23 +86,38 @@ function _inherits(subClass, superClass) {
       configurable: true
     }
   });
+  Object.defineProperty(subClass, "prototype", {
+    writable: false
+  });
   if (superClass) _setPrototypeOf(subClass, superClass);
 }
 
 function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
   };
   return _getPrototypeOf(o);
 }
 
 function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) {
     o.__proto__ = p;
     return o;
   };
-
   return _setPrototypeOf(o, p);
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 function _assertThisInitialized(self) {
@@ -127,25 +131,42 @@ function _assertThisInitialized(self) {
 function _possibleConstructorReturn(self, call) {
   if (call && (typeof call === "object" || typeof call === "function")) {
     return call;
+  } else if (call !== void 0) {
+    throw new TypeError("Derived constructors may only return object or undefined");
   }
 
   return _assertThisInitialized(self);
 }
 
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
 
 function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
 }
 
 function _arrayWithHoles(arr) {
@@ -153,21 +174,21 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
-  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-    return;
-  }
+  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
 
+  if (_i == null) return;
   var _arr = [];
   var _n = true;
   var _d = false;
-  var _e = undefined;
+
+  var _s, _e;
 
   try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
       _arr.push(_s.value);
 
       if (i && _arr.length === i) break;
@@ -186,12 +207,29 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }//
 //
 //
@@ -233,6 +271,10 @@ var script = {
     height: {
       type: [Number, String],
       default: 300
+    },
+    isHidden: {
+      type: Function,
+      required: false
     }
   },
   watch: {
@@ -385,7 +427,7 @@ var __vue_staticRenderFns__ = [];
 
 var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
   if (!inject) return;
-  inject("data-v-52bb9522_0", {
+  inject("data-v-364e5dea_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}",
     map: undefined,
     media: undefined
@@ -397,13 +439,13 @@ var __vue_inject_styles__ = function __vue_inject_styles__(inject) {
 var __vue_scope_id__ = undefined;
 /* module identifier */
 
-var __vue_module_identifier__ = "data-v-52bb9522";
+var __vue_module_identifier__ = "data-v-364e5dea";
 /* functional template */
 
 var __vue_is_functional_template__ = false;
 /* style inject shadow dom */
 
-var __vue_component__ = normalizeComponent({
+var __vue_component__ = /*#__PURE__*/normalizeComponent({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, createInjectorSSR, undefined);var d3 = {
@@ -413,9 +455,7 @@ var __vue_component__ = normalizeComponent({
 * D3 Chart Base
 */
 
-var d3chart =
-/*#__PURE__*/
-function () {
+var d3chart = /*#__PURE__*/function () {
   function d3chart(selection, data, config, cfg) {
     var _this = this;
 
@@ -520,8 +560,32 @@ function () {
   }, {
     key: "getDimensions",
     value: function getDimensions() {
-      this.cfg.width = parseInt(this.selection.node().offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
-      this.cfg.height = parseInt(this.selection.node().offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+      function isHidden(node) {
+        var _node$parentElement, _node$parentElement$p, _node$parentElement$p2, _node$parentElement$p3;
+
+        var root = node === null || node === void 0 ? void 0 : (_node$parentElement = node.parentElement) === null || _node$parentElement === void 0 ? void 0 : (_node$parentElement$p = _node$parentElement.parentElement) === null || _node$parentElement$p === void 0 ? void 0 : (_node$parentElement$p2 = _node$parentElement$p.parentElement) === null || _node$parentElement$p2 === void 0 ? void 0 : (_node$parentElement$p3 = _node$parentElement$p2.parentElement) === null || _node$parentElement$p3 === void 0 ? void 0 : _node$parentElement$p3.parentElement;
+
+        if (root) {
+          var display = window.getComputedStyle(root).display;
+          return display === 'none';
+        } else {
+          return false;
+        }
+      }
+
+      var node = this.selection.node();
+      var width = parseInt(node.offsetWidth) - this.cfg.margin.left - this.cfg.margin.right;
+      var height = parseInt(node.offsetHeight) - this.cfg.margin.top - this.cfg.margin.bottom;
+
+      if (this.cfg.width === undefined) {
+        this.cfg.width = width;
+        this.cfg.height = height;
+        console.debug("Dimensions was undefined - current dimensions:", this.cfg.width, this.cfg.height);
+      } else if (!isHidden(node)) {
+        this.cfg.width = width;
+        this.cfg.height = height;
+        console.debug("Element is visible, calculated dimensions:", this.cfg.width, this.cfg.height);
+      }
     }
     /**
     * Returns chart's data
@@ -746,15 +810,15 @@ function () {
  * D3 Bar Chart
  */
 
-var d3barchart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3barchart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3barchart, _d3chart);
+
+  var _super = _createSuper(d3barchart);
 
   function d3barchart(selection, data, config) {
     _classCallCheck(this, d3barchart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3barchart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 10,
         right: 30,
@@ -789,7 +853,7 @@ function (_d3chart) {
         duration: 350,
         ease: "easeLinear"
       }
-    }));
+    });
   }
   /**
    * Init chart
@@ -910,9 +974,10 @@ function (_d3chart) {
         return _this3.cfg.orientation !== 'horizontal' ? _this3.cfg.height : _this3.xScaleInn(_this3.cfg.values[i % _this3.cfg.values.length]);
       }).attr('height', 0).attr('width', 0).on('mouseover', function (d, i) {
         var key = _this3.cfg.values[i % _this3.cfg.values.length];
+        var label = _this3.cfg.tooltip ? d[_this3.cfg.tooltip.label] : key;
 
         _this3.tooltip.html(function () {
-          return "<div>".concat(key, ": ").concat(d[key], "</div>");
+          return "<div>".concat(label, ": ").concat(d[key], "</div>");
         }).classed('active', true);
       }).on('mouseout', function () {
         _this3.tooltip.classed('active', false);
@@ -986,7 +1051,7 @@ var __vue_is_functional_template__$1 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$1 = normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);var d3$2 = {
+var __vue_component__$1 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);var d3$2 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleOrdinal: d3Scale.scaleOrdinal,
@@ -1063,15 +1128,15 @@ var __vue_component__$1 = normalizeComponent({}, __vue_inject_styles__$1, __vue_
  * D3 Line Chart
  */
 
-var d3linechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3linechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3linechart, _d3chart);
+
+  var _super = _createSuper(d3linechart);
 
   function d3linechart(selection, data, config) {
     _classCallCheck(this, d3linechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3linechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -1112,7 +1177,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -1373,7 +1438,432 @@ var __vue_is_functional_template__$2 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$2 = normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);var d3$3 = {
+var __vue_component__$2 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);var d3$3 = {
+  select: d3Selection.select,
+  selectAll: d3Selection.selectAll,
+  scaleOrdinal: d3Scale.scaleOrdinal,
+  scaleLinear: d3Scale.scaleLinear,
+  scaleTime: d3Scale.scaleTime,
+  timeParse: d3TimeFormat.timeParse,
+  timeFormat: d3TimeFormat.timeFormat,
+  max: d3Array.max,
+  min: d3Array.min,
+  extent: d3Array.extent,
+  line: d3Shape.line,
+  area: d3Shape.area,
+  transition: d3Transition.transition,
+  axisLeft: d3Axis.axisLeft,
+  axisBottom: d3Axis.axisBottom,
+  easeLinear: d3Ease.easeLinear,
+  easePolyIn: d3Ease.easePolyIn,
+  easePolyOut: d3Ease.easePolyOut,
+  easePoly: d3Ease.easePoly,
+  easePolyInOut: d3Ease.easePolyInOut,
+  easeQuadIn: d3Ease.easeQuadIn,
+  easeQuadOut: d3Ease.easeQuadOut,
+  easeQuad: d3Ease.easeQuad,
+  easeQuadInOut: d3Ease.easeQuadInOut,
+  easeCubicIn: d3Ease.easeCubicIn,
+  easeCubicOut: d3Ease.easeCubicOut,
+  easeCubic: d3Ease.easeCubic,
+  easeCubicInOut: d3Ease.easeCubicInOut,
+  easeSinIn: d3Ease.easeSinIn,
+  easeSinOut: d3Ease.easeSinOut,
+  easeSin: d3Ease.easeSin,
+  easeSinInOut: d3Ease.easeSinInOut,
+  easeExpIn: d3Ease.easeExpIn,
+  easeExpOut: d3Ease.easeExpOut,
+  easeExp: d3Ease.easeExp,
+  easeExpInOut: d3Ease.easeExpInOut,
+  easeCircleIn: d3Ease.easeCircleIn,
+  easeCircleOut: d3Ease.easeCircleOut,
+  easeCircle: d3Ease.easeCircle,
+  easeCircleInOut: d3Ease.easeCircleInOut,
+  easeElasticIn: d3Ease.easeElasticIn,
+  easeElastic: d3Ease.easeElastic,
+  easeElasticOut: d3Ease.easeElasticOut,
+  easeElasticInOut: d3Ease.easeElasticInOut,
+  easeBackIn: d3Ease.easeBackIn,
+  easeBackOut: d3Ease.easeBackOut,
+  easeBack: d3Ease.easeBack,
+  easeBackInOut: d3Ease.easeBackInOut,
+  easeBounceIn: d3Ease.easeBounceIn,
+  easeBounce: d3Ease.easeBounce,
+  easeBounceOut: d3Ease.easeBounceOut,
+  easeBounceInOut: d3Ease.easeBounceInOut,
+  curveBasis: d3Shape.curveBasis,
+  curveBundle: d3Shape.curveBundle,
+  curveCardinal: d3Shape.curveCardinal,
+  curveCatmullRom: d3Shape.curveCatmullRom,
+  curveLinear: d3Shape.curveLinear,
+  curveMonotoneX: d3Shape.curveMonotoneX,
+  curveMonotoneY: d3Shape.curveMonotoneY,
+  curveNatural: d3Shape.curveNatural,
+  curveStep: d3Shape.curveStep,
+  curveStepAfter: d3Shape.curveStepAfter,
+  curveStepBefore: d3Shape.curveStepBefore,
+  schemeCategory10: d3ScaleChromatic.schemeCategory10,
+  schemeAccent: d3ScaleChromatic.schemeAccent,
+  schemeDark2: d3ScaleChromatic.schemeDark2,
+  schemePaired: d3ScaleChromatic.schemePaired,
+  schemePastel1: d3ScaleChromatic.schemePastel1,
+  schemePastel2: d3ScaleChromatic.schemePastel2,
+  schemeSet1: d3ScaleChromatic.schemeSet1,
+  schemeSet2: d3ScaleChromatic.schemeSet2,
+  schemeSet3: d3ScaleChromatic.schemeSet3,
+  schemeTableau10: d3ScaleChromatic.schemeTableau10
+};
+/**
+ * D3 Area Chart
+ */
+
+var d3areachart = /*#__PURE__*/function (_d3chart) {
+  _inherits(d3areachart, _d3chart);
+
+  var _super = _createSuper(d3areachart);
+
+  function d3areachart(selection, data, config) {
+    _classCallCheck(this, d3areachart);
+
+    return _super.call(this, selection, data, config, {
+      margin: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 40
+      },
+      values: [],
+      areas: {},
+      date: {
+        key: false,
+        inputFormat: "%Y-%m-%d",
+        outputFormat: "%Y-%m-%d"
+      },
+      color: {
+        key: false,
+        keys: false,
+        scheme: false,
+        current: '#1f77b4',
+        default: '#AAA',
+        axis: '#000'
+      },
+      curve: 'curveBasis',
+      areacurve: 'curveBasis',
+      points: {
+        visibleSize: 3,
+        hoverSize: 6
+      },
+      axis: {
+        yTitle: false,
+        xTitle: false,
+        yFormat: ".0f",
+        xFormat: "%Y-%m-%d",
+        yTicks: 5,
+        xTicks: 3
+      },
+      tooltip: {
+        labels: false
+      },
+      transition: {
+        duration: 350,
+        ease: 'easeLinear'
+      }
+    });
+  }
+  /**
+  * Init chart
+  */
+
+
+  _createClass(d3areachart, [{
+    key: "initChart",
+    value: function initChart() {
+      // Set up dimensions
+      this.getDimensions();
+      this.initChartFrame('areachart'); // Format date functions
+
+      this.parseTime = d3$3.timeParse(this.cfg.date.inputFormat);
+      this.formatTime = d3$3.timeFormat(this.cfg.date.outputFormat); // Init scales
+
+      this.yScale = d3$3.scaleLinear();
+      this.xScale = d3$3.scaleTime(); // this.line = d3.line();
+
+      this.areagen = d3$3.area();
+      this.line = d3$3.line(); // Axis group
+
+      this.axisg = this.g.append('g').attr('class', 'chart__axis chart__axis--areachart'); // Horizontal grid
+
+      this.yGrid = this.axisg.append("g").attr("class", "chart__grid chart__grid--y chart__grid--areachart"); // Bottom axis
+
+      this.xAxis = this.axisg.append("g").attr("class", "chart__axis-x chart__axis-x--areachart"); // Vertical axis
+
+      this.yAxis = this.axisg.append("g").attr("class", "chart__axis-y chart__axis-y--areachart chart__grid"); // Vertical axis title
+
+      if (this.cfg.axis.yTitle) this.yAxisTitle = this.axisg.append('text').attr('class', 'chart__axis-title chart__axis-title--areachart').attr("transform", 'rotate(-90)').style("text-anchor", "middle");
+      this.setChartDimension();
+      this.updateChart();
+    }
+    /**
+     * Calcule required derivated data
+     */
+
+  }, {
+    key: "computeData",
+    value: function computeData() {
+      var _this = this;
+
+      // Calcule transpose data
+      var tData = [];
+      this.cfg.values.forEach(function (j, i) {
+        tData[i] = {};
+        tData[i].key = j;
+        tData[i].values = [];
+      });
+      this.data.forEach(function (d) {
+        d.jsdate = _this.parseTime(d[_this.cfg.date.key]);
+      });
+      this.data.sort(function (a, b) {
+        return a.jsdate - b.jsdate;
+      });
+      this.data.forEach(function (d, c) {
+        d.min = 9999999999999999999;
+        d.max = -9999999999999999999;
+
+        _this.cfg.values.forEach(function (j, i) {
+          var jyl_cn = _this.cfg.areas[j].lower;
+          var jyu_cn = _this.cfg.areas[j].upper;
+          var jyo_cn = _this.cfg.areas[j].observed;
+          tData[i].values.push({
+            x: d.jsdate,
+            y: +d[j],
+            y0: +d[jyl_cn],
+            y1: +d[jyu_cn],
+            yo: +d[jyo_cn],
+            k: i
+          });
+          if (d[j] < d.min) d.min = +d[jyl_cn];
+          if (d[j] > d.max) d.max = +d[jyu_cn];
+        });
+      }); // console.log('data', this.data)
+      // console.log('tdata', tData)
+
+      this.tData = tData;
+    }
+    /**
+     * Set up chart dimensions (non depending on data)
+     */
+
+  }, {
+    key: "setChartDimension",
+    value: function setChartDimension() {
+      // Resize SVG element
+      this.svg.attr("viewBox", "0 0 ".concat(this.cfg.width + this.cfg.margin.left + this.cfg.margin.right, " ").concat(this.cfg.height + this.cfg.margin.top + this.cfg.margin.bottom)).attr("width", this.cfg.width + this.cfg.margin.left + this.cfg.margin.right).attr("height", this.cfg.height + this.cfg.margin.top + this.cfg.margin.bottom); // Vertical axis title
+
+      if (this.cfg.axis.yTitle) this.yAxisTitle.attr("y", -this.cfg.margin.left + 10).attr("x", -this.cfg.height / 2).text(this.cfg.axis.yTitle);
+    }
+    /**
+     * Set up scales
+     */
+
+  }, {
+    key: "setScales",
+    value: function setScales() {
+      var _this2 = this;
+
+      // Calcule vertical scale
+      this.yScale.domain([d3$3.min(this.data, function (d) {
+        return d.min;
+      }), d3$3.max(this.data, function (d) {
+        return d.max;
+      })]).rangeRound([this.cfg.height, 0]); // Calcule horizontal scale
+
+      this.xScale.domain(d3$3.extent(this.data, function (d) {
+        return d.jsdate;
+      })).rangeRound([0, this.cfg.width]);
+
+      if (this.cfg.color.scheme instanceof Array === true) {
+        this.colorScale = d3$3.scaleOrdinal().range(this.cfg.color.scheme);
+      } else if (typeof this.cfg.color.scheme === 'string') {
+        this.colorScale = d3$3.scaleOrdinal(d3$3[this.cfg.color.scheme]);
+      } // Set up area function
+
+
+      this.areagen.x(function (d, i) {
+        return _this2.xScale(d.x);
+      }).y0(function (d, i) {
+        return _this2.yScale(d.y0);
+      }).y1(function (d, i) {
+        return _this2.yScale(d.y1);
+      }).curve(d3$3[this.cfg.areacurve]); // Set up line function
+
+      this.line.x(function (d) {
+        return _this2.xScale(d.x);
+      }).y(function (d) {
+        return _this2.yScale(d.y);
+      }).curve(d3$3[this.cfg.curve]); // Redraw grid
+
+      this.yGrid.call(d3$3.axisLeft(this.yScale).tickSize(-this.cfg.width).ticks(this.cfg.axis.yTicks, this.cfg.axis.yFormat)); // Redraw horizontal axis
+
+      this.xAxis.attr("transform", "translate(0,".concat(this.cfg.height, ")")).call(d3$3.axisBottom(this.xScale).tickFormat(this.formatTime).ticks(this.cfg.axis.xTicks, this.cfg.axis.xFormat));
+    }
+    /**
+     * Bind data to main elements groups
+     */
+
+  }, {
+    key: "bindData",
+    value: function bindData() {
+      // Set transition
+      this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]); // Area group
+
+      this.source = this.g.selectAll(".chart__multiarea-group").data(this.tData, function (d) {
+        return d.key;
+      }); // Lines group
+
+      this.linesgroup = this.g.selectAll(".chart__lines-group").data(this.tData, function (d) {
+        return d.key;
+      }); // Set points store
+
+      if (!this.pointsg || this.pointsg instanceof Array === false) {
+        this.pointsg = [];
+      }
+    }
+    /**
+     * Add new chart's elements
+     */
+
+  }, {
+    key: "enterElements",
+    value: function enterElements() {
+      var _this3 = this;
+
+      // Elements to add
+      var esource = this.source.enter().append('g').attr("class", function (d) {
+        return "chart__multiarea-group chart__".concat(d.key, "-group chart__multiarea-group--areachart");
+      }); // avoid scope problems
+
+      var ag = this.areagen;
+      esource.append('path').attr("class", "chart__area chart__area--areachart").attr('fill-opacity', '0.3').attr("d", function (d) {
+        return ag(d.values);
+      }); // Elements to add
+
+      var newlinegroup = this.linesgroup.enter().append('g').attr("class", "chart__lines-group chart__lines-group--areachart"); // Lines
+
+      newlinegroup.append('path').attr("class", "chart__line chart__line--areachart").attr('fill', 'transparent').attr("d", function (d) {
+        return _this3.line(d.values.map(function (v) {
+          return {
+            y: 0,
+            x: v.x,
+            k: v.k
+          };
+        }));
+      }); // Don't continue if points are disabled
+
+      if (this.cfg.points === false) return;
+      var ck = this.cfg.points.colKey;
+      this.cfg.values.forEach(function (k, i) {
+        // Point group
+        var gp = _this3.g.selectAll('.chart__points-group--' + ck).data(_this3.data).enter().append('g').attr('class', 'chart__points-group chart__points-group--areachart chart__points-group--' + ck).attr('transform', function (d) {
+          return "translate(".concat(_this3.xScale(d.jsdate), ",").concat(_this3.cfg.height, ")");
+        }); // Visible point
+
+
+        gp.append('circle').attr('class', 'chart__point-visible chart__point-visible--areachart').attr('pointer-events', 'none');
+
+        _this3.pointsg.push({
+          selection: gp,
+          key: ck
+        });
+      });
+    }
+    /**
+     * Update chart's elements based on data change
+     */
+
+  }, {
+    key: "updateElements",
+    value: function updateElements() {
+      var _this4 = this;
+
+      // avoid scope problems
+      var ag = this.areagen;
+      this.g.selectAll('.chart__area').transition(this.transition).attr('fill', function (d) {
+        return _this4.colorElement(d, 'key');
+      }).attr("d", function (d, i) {
+        return ag(_this4.tData[i].values);
+      }); // Color lines
+
+      this.linesgroup.attr('stroke', function (d) {
+        return _this4.colorElement(d, 'key');
+      }); // Redraw lines
+
+      this.g.selectAll('.chart__line').attr('stroke', function (d) {
+        return _this4.colorElement(d, 'key');
+      }).transition(this.transition).attr("d", function (d, i) {
+        return _this4.line(_this4.tData[i].values);
+      }); // Redraw points
+
+      this.pointsg.forEach(function (p, i) {
+        p.selection.transition(_this4.transition).attr('transform', function (d) {
+          if (d[p.key]) {
+            return "translate(".concat(_this4.xScale(d.jsdate), ",").concat(_this4.yScale(d[p.key]), ")");
+          } else {
+            return "translate(".concat(_this4.xScale(d.jsdate), ",").concat(_this4.yScale(0), ")");
+          }
+        }); // Visible point
+
+        p.selection.selectAll('.chart__point-visible').attr('fill', function (d) {
+          return _this4.colorElement(p, 'points');
+        }).attr('r', function (d) {
+          if (d[p.key]) {
+            return _this4.cfg.points.visibleSize;
+          } else {
+            return 0;
+          }
+        });
+      });
+    }
+    /**
+     * Remove chart's elements without data
+     */
+
+  }, {
+    key: "exitElements",
+    value: function exitElements() {
+      this.source.exit().transition(this.transition).style("opacity", 0).remove();
+    }
+  }]);
+
+  return d3areachart;
+}(d3chart);var script$3 = {
+  name: 'D3AreaChart',
+  extends: __vue_component__,
+  mounted: function mounted() {
+    this.chart = new d3areachart(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
+  }
+};/* script */
+var __vue_script__$3 = script$3;
+/* template */
+
+/* style */
+
+var __vue_inject_styles__$3 = undefined;
+/* scoped */
+
+var __vue_scope_id__$3 = undefined;
+/* module identifier */
+
+var __vue_module_identifier__$3 = "data-v-0609aa73";
+/* functional template */
+
+var __vue_is_functional_template__$3 = undefined;
+/* style inject */
+
+/* style inject SSR */
+
+/* style inject shadow dom */
+
+var __vue_component__$3 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, undefined, undefined, undefined);var d3$4 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -1436,15 +1926,15 @@ var __vue_component__$2 = normalizeComponent({}, __vue_inject_styles__$2, __vue_
 * D3 Pie Chart
 */
 
-var d3piechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3piechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3piechart, _d3chart);
+
+  var _super = _createSuper(d3piechart);
 
   function d3piechart(selection, data, config) {
     _classCallCheck(this, d3piechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3piechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 40,
         right: 20,
@@ -1471,7 +1961,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -1486,10 +1976,10 @@ function (_d3chart) {
       // Set up dimensions
       this.getDimensions();
       this.initChartFrame('piechart');
-      this.cScale = d3$3.scaleOrdinal();
-      this.arc = d3$3.arc();
-      this.outerArc = d3$3.arc();
-      this.pie = d3$3.pie().sort(null).value(function (d) {
+      this.cScale = d3$4.scaleOrdinal();
+      this.arc = d3$4.arc();
+      this.outerArc = d3$4.arc();
+      this.pie = d3$4.pie().sort(null).value(function (d) {
         return d[_this.cfg.value];
       }).padAngle(this.cfg.radius.padding);
 
@@ -1527,7 +2017,7 @@ function (_d3chart) {
         return d.data[_this2.cfg.key];
       }); // Set transition
 
-      this.transition = d3$3.transition('t').duration(this.cfg.transition.duration).ease(d3$3[this.cfg.transition.ease]);
+      this.transition = d3$4.transition('t').duration(this.cfg.transition.duration).ease(d3$4[this.cfg.transition.ease]);
     }
     /**
     * Set up scales
@@ -1547,16 +2037,16 @@ function (_d3chart) {
       } // Set up arcs
 
 
-      this.arc = d3$3.arc().outerRadius(this.cfg.radius.outter).innerRadius(inRadius).cornerRadius(this.cfg.radius.round);
-      this.outerArc = d3$3.arc().outerRadius(this.cfg.radius.outter * 1.1).innerRadius(this.cfg.radius.outter * 1.1); // Set up color scheme
+      this.arc = d3$4.arc().outerRadius(this.cfg.radius.outter).innerRadius(inRadius).cornerRadius(this.cfg.radius.round);
+      this.outerArc = d3$4.arc().outerRadius(this.cfg.radius.outter * 1.1).innerRadius(this.cfg.radius.outter * 1.1); // Set up color scheme
 
       if (this.cfg.color.scheme) {
         if (this.cfg.color.scheme instanceof Array === true) {
-          this.colorScale = d3$3.scaleOrdinal().domain(this.data.map(function (d) {
+          this.colorScale = d3$4.scaleOrdinal().domain(this.data.map(function (d) {
             return d[_this3.cfg.key];
           })).range(this.cfg.color.scheme);
         } else {
-          this.colorScale = d3$3.scaleOrdinal(d3$3[this.cfg.color.scheme]).domain(this.data.map(function (d) {
+          this.colorScale = d3$4.scaleOrdinal(d3$4[this.cfg.color.scheme]).domain(this.data.map(function (d) {
             return d[_this3.cfg.key];
           }));
         }
@@ -1576,7 +2066,7 @@ function (_d3chart) {
       newg.append("path").attr("class", "chart__slice chart__slice--piechart").transition(this.transition).delay(function (d, i) {
         return i * _this4.cfg.transition.duration;
       }).attrTween('d', function (d) {
-        var i = d3$3.interpolate(d.startAngle + 0.1, d.endAngle);
+        var i = d3$4.interpolate(d.startAngle + 0.1, d.endAngle);
         return function (t) {
           d.endAngle = i(t);
           return _this4.arc(d);
@@ -1622,7 +2112,7 @@ function (_d3chart) {
       }).transition(this.transition).delay(function (d, i) {
         return i * _this5.cfg.transition.duration;
       }).attrTween('d', function (d) {
-        var i = d3$3.interpolate(d.startAngle + 0.1, d.endAngle);
+        var i = d3$4.interpolate(d.startAngle + 0.1, d.endAngle);
         return function (t) {
           d.endAngle = i(t);
           return _this5.arc(d);
@@ -1678,7 +2168,7 @@ function (_d3chart) {
     value: function arcTween(a) {
       var _this6 = this;
 
-      var i = d3$3.interpolate(this._current, a);
+      var i = d3$4.interpolate(this._current, a);
       this._current = i(0);
       return function (t) {
         return _this6.arc(i(t));
@@ -1687,19 +2177,19 @@ function (_d3chart) {
   }]);
 
   return d3piechart;
-}(d3chart);var script$3 = {
+}(d3chart);var script$4 = {
   name: 'D3PieChart',
   extends: __vue_component__,
   mounted: function mounted() {
     this.chart = new d3piechart(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
   }
 };/* script */
-var __vue_script__$3 = script$3;
+var __vue_script__$4 = script$4;
 /* template */
 
 /* style */
 
-var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$4 = function __vue_inject_styles__(inject) {
   if (!inject) return;
   inject("data-v-ac66c84e_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}.chart--piechart .chart__line{fill:none;stroke:#000}",
@@ -1710,16 +2200,16 @@ var __vue_inject_styles__$3 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$3 = undefined;
+var __vue_scope_id__$4 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$3 = "data-v-ac66c84e";
+var __vue_module_identifier__$4 = "data-v-ac66c84e";
 /* functional template */
 
-var __vue_is_functional_template__$3 = undefined;
+var __vue_is_functional_template__$4 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$3 = normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, undefined, createInjectorSSR, undefined);var d3$4 = {
+var __vue_component__$4 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, undefined, createInjectorSSR, undefined);var d3$5 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -1779,15 +2269,15 @@ var __vue_component__$3 = normalizeComponent({}, __vue_inject_styles__$3, __vue_
 * D3 Slope Chart
 */
 
-var d3slopechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3slopechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3slopechart, _d3chart);
+
+  var _super = _createSuper(d3slopechart);
 
   function d3slopechart(selection, data, config) {
     _classCallCheck(this, d3slopechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3slopechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 10,
         right: 100,
@@ -1816,7 +2306,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -1830,7 +2320,7 @@ function (_d3chart) {
       this.getDimensions();
       this.initChartFrame('slopechart'); // Set up scales
 
-      this.yScale = d3$4.scaleLinear(); // Axis group
+      this.yScale = d3$5.scaleLinear(); // Axis group
 
       var axisg = this.g.append('g').attr('class', 'chart__axis chart__axis--slopechart'); // Vertical left axis
 
@@ -1875,19 +2365,19 @@ function (_d3chart) {
       var _this = this;
 
       // Set up dimensional scales
-      this.yScale.rangeRound([this.cfg.height, 0]).domain([d3$4.min(this.data, function (d) {
+      this.yScale.rangeRound([this.cfg.height, 0]).domain([d3$5.min(this.data, function (d) {
         return d[_this.cfg.values[0]] < d[_this.cfg.values[1]] ? d[_this.cfg.values[0]] * 0.9 : d[_this.cfg.values[1]] * 0.9;
-      }), d3$4.max(this.data, function (d) {
+      }), d3$5.max(this.data, function (d) {
         return d[_this.cfg.values[0]] > d[_this.cfg.values[1]] ? d[_this.cfg.values[0]] * 1.1 : d[_this.cfg.values[1]] * 1.1;
       })]); // Set up color scheme
 
       if (this.cfg.color.scheme) {
         if (this.cfg.color.scheme instanceof Array === true) {
-          this.colorScale = d3$4.scaleOrdinal().domain(this.data.map(function (d) {
+          this.colorScale = d3$5.scaleOrdinal().domain(this.data.map(function (d) {
             return d[_this.cfg.key];
           })).range(this.cfg.color.scheme);
         } else {
-          this.colorScale = d3$4.scaleOrdinal(d3$4[this.cfg.color.scheme]).domain(this.data.map(function (d) {
+          this.colorScale = d3$5.scaleOrdinal(d3$5[this.cfg.color.scheme]).domain(this.data.map(function (d) {
             return d[_this.cfg.key];
           }));
         }
@@ -1907,7 +2397,7 @@ function (_d3chart) {
         return d[_this2.cfg.key];
       }); // Set transition
 
-      this.transition = d3$4.transition('t').duration(this.cfg.transition.duration).ease(d3$4[this.cfg.transition.ease]);
+      this.transition = d3$5.transition('t').duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]);
     }
     /**
     * Add new chart's elements
@@ -2011,19 +2501,19 @@ function (_d3chart) {
   }]);
 
   return d3slopechart;
-}(d3chart);var script$4 = {
+}(d3chart);var script$5 = {
   name: 'D3SlopeChart',
   extends: __vue_component__,
   mounted: function mounted() {
     this.chart = new d3slopechart(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
   }
 };/* script */
-var __vue_script__$4 = script$4;
+var __vue_script__$5 = script$5;
 /* template */
 
 /* style */
 
-var __vue_inject_styles__$4 = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$5 = function __vue_inject_styles__(inject) {
   if (!inject) return;
   inject("data-v-6b03ba8c_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}.chart--slopegraph .chart__line--current{stroke-width:2px}",
@@ -2034,16 +2524,16 @@ var __vue_inject_styles__$4 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$4 = undefined;
+var __vue_scope_id__$5 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$4 = "data-v-6b03ba8c";
+var __vue_module_identifier__$5 = "data-v-6b03ba8c";
 /* functional template */
 
-var __vue_is_functional_template__$4 = undefined;
+var __vue_is_functional_template__$5 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$4 = normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, undefined, createInjectorSSR, undefined);var d3$5 = {
+var __vue_component__$5 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, undefined, createInjectorSSR, undefined);var d3$6 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -2106,15 +2596,15 @@ var __vue_component__$4 = normalizeComponent({}, __vue_inject_styles__$4, __vue_
 * D3 Sunburst
 */
 
-var d3sunburst =
-/*#__PURE__*/
-function (_d3chart) {
+var d3sunburst = /*#__PURE__*/function (_d3chart) {
   _inherits(d3sunburst, _d3chart);
+
+  var _super = _createSuper(d3sunburst);
 
   function d3sunburst(selection, data, config) {
     _classCallCheck(this, d3sunburst);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3sunburst).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -2135,7 +2625,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2175,10 +2665,10 @@ function (_d3chart) {
       var _this = this;
 
       var partition = function partition(data) {
-        var root = d3$5.hierarchy(data).sum(function (d) {
+        var root = d3$6.hierarchy(data).sum(function (d) {
           return d[_this.cfg.value];
         });
-        return d3$5.partition()(root);
+        return d3$6.partition()(root);
       };
 
       this.hData = partition(this.data[0]).descendants();
@@ -2186,7 +2676,7 @@ function (_d3chart) {
         return d.data[_this.cfg.key];
       }); // Set transition
 
-      this.transition = d3$5.transition('t').duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]);
+      this.transition = d3$6.transition('t').duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]);
     }
     /**
     * Set up scales
@@ -2198,9 +2688,9 @@ function (_d3chart) {
       var _this2 = this;
 
       this.radius = Math.min(this.cfg.width, this.cfg.height) / 2;
-      this.xScale = d3$5.scaleLinear().range([0, 2 * Math.PI]).clamp(true);
-      this.yScale = d3$5.scaleSqrt().range([this.radius * .1, this.radius]);
-      this.arc = d3$5.arc().startAngle(function (d) {
+      this.xScale = d3$6.scaleLinear().range([0, 2 * Math.PI]).clamp(true);
+      this.yScale = d3$6.scaleSqrt().range([this.radius * .1, this.radius]);
+      this.arc = d3$6.arc().startAngle(function (d) {
         return _this2.xScale(d.x0);
       }).endAngle(function (d) {
         return _this2.xScale(d.x1);
@@ -2212,9 +2702,9 @@ function (_d3chart) {
 
       if (this.cfg.color.scheme) {
         if (this.cfg.color.scheme instanceof Array === true) {
-          this.colorScale = d3$5.scaleOrdinal().range(this.cfg.color.scheme);
+          this.colorScale = d3$6.scaleOrdinal().range(this.cfg.color.scheme);
         } else {
-          this.colorScale = d3$5.scaleOrdinal(d3$5[this.cfg.color.scheme]);
+          this.colorScale = d3$6.scaleOrdinal(d3$6[this.cfg.color.scheme]);
         }
       }
     }
@@ -2244,10 +2734,10 @@ function (_d3chart) {
       }).on('mousemove', function () {
         _this3.tooltip.style('left', window.event['pageX'] - 28 + 'px').style('top', window.event['pageY'] - 40 + 'px');
       }).transition(this.transition).attrTween('d', function (d) {
-        var iy0 = d3$5.interpolate(0, d.y0);
-        var iy1 = d3$5.interpolate(d.y0, d.y1);
-        var ix0 = d3$5.interpolate(0, d.x0);
-        var ix1 = d3$5.interpolate(0, d.x1);
+        var iy0 = d3$6.interpolate(0, d.y0);
+        var iy1 = d3$6.interpolate(d.y0, d.y1);
+        var ix0 = d3$6.interpolate(0, d.x0);
+        var ix1 = d3$6.interpolate(0, d.x1);
         return function (t) {
           d.y0 = iy0(t);
           d.y1 = iy1(t);
@@ -2271,10 +2761,10 @@ function (_d3chart) {
           return j.data.name === d.data.name;
         })[0];
 
-        var iy0 = d3$5.interpolate(d.y0, d2.y0);
-        var iy1 = d3$5.interpolate(d.y1, d2.y1);
-        var ix0 = d3$5.interpolate(d.x0, d2.x0);
-        var ix1 = d3$5.interpolate(d.x1, d2.x1);
+        var iy0 = d3$6.interpolate(d.y0, d2.y0);
+        var iy1 = d3$6.interpolate(d.y1, d2.y1);
+        var ix0 = d3$6.interpolate(d.x0, d2.x0);
+        var ix1 = d3$6.interpolate(d.x1, d2.x1);
         return function (t) {
           d2.y0 = iy0(t);
           d2.y1 = iy1(t);
@@ -2318,9 +2808,9 @@ function (_d3chart) {
       var d2 = this.hData.filter(function (j) {
         return j.data.name === d.data.name;
       })[0];
-      var transition = this.svg.transition().duration(this.cfg.transition.duration).ease(d3$5[this.cfg.transition.ease]).tween('scale', function () {
-        var xd = d3$5.interpolate(_this5.xScale.domain(), [d2.x0, d2.x1]);
-        var yd = d3$5.interpolate(_this5.yScale.domain(), [d2.y0, 1]);
+      var transition = this.svg.transition().duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]).tween('scale', function () {
+        var xd = d3$6.interpolate(_this5.xScale.domain(), [d2.x0, d2.x1]);
+        var yd = d3$6.interpolate(_this5.yScale.domain(), [d2.y0, 1]);
         return function (t) {
           _this5.xScale.domain(xd(t));
 
@@ -2340,35 +2830,35 @@ function (_d3chart) {
   }]);
 
   return d3sunburst;
-}(d3chart);var script$5 = {
+}(d3chart);var script$6 = {
   name: 'D3Sunburst',
   extends: __vue_component__,
   mounted: function mounted() {
     this.chart = new d3sunburst(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
   }
 };/* script */
-var __vue_script__$5 = script$5;
+var __vue_script__$6 = script$6;
 /* template */
 
 /* style */
 
-var __vue_inject_styles__$5 = undefined;
+var __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-var __vue_scope_id__$5 = undefined;
+var __vue_scope_id__$6 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$5 = "data-v-4ce47b3e";
+var __vue_module_identifier__$6 = "data-v-4ce47b3e";
 /* functional template */
 
-var __vue_is_functional_template__$5 = undefined;
+var __vue_is_functional_template__$6 = undefined;
 /* style inject */
 
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$5 = normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, undefined, undefined, undefined);var d3$6 = {
+var __vue_component__$6 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);var d3$7 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleOrdinal: d3Scale.scaleOrdinal,
@@ -2429,15 +2919,15 @@ var __vue_component__$5 = normalizeComponent({}, __vue_inject_styles__$5, __vue_
  * D3 Words Cloud
  */
 
-var d3wordscloud =
-/*#__PURE__*/
-function (_d3chart) {
+var d3wordscloud = /*#__PURE__*/function (_d3chart) {
   _inherits(d3wordscloud, _d3chart);
+
+  var _super = _createSuper(d3wordscloud);
 
   function d3wordscloud(selection, data, config) {
     _classCallCheck(this, d3wordscloud);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3wordscloud).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -2464,7 +2954,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2490,7 +2980,7 @@ function (_d3chart) {
     value: function computeData() {
       var _this = this;
 
-      var layout = d3$6.cloud().size([this.cfg.width, this.cfg.height]).words(this.data.map(function (d) {
+      var layout = d3$7.cloud().size([this.cfg.width, this.cfg.height]).words(this.data.map(function (d) {
         return {
           text: d[_this.cfg.key],
           size: d[_this.cfg.value]
@@ -2523,7 +3013,7 @@ function (_d3chart) {
     key: "bindData",
     value: function bindData() {
       // Set transition
-      this.transition = d3$6.transition('t').duration(this.cfg.transition.duration).ease(d3$6[this.cfg.transition.ease]); // Word group selection data
+      this.transition = d3$7.transition('t').duration(this.cfg.transition.duration).ease(d3$7[this.cfg.transition.ease]); // Word group selection data
 
       this.wordgroup = this.gcenter.selectAll(".chart__word-group").data(this.tData, function (d) {
         return d.text;
@@ -2537,9 +3027,9 @@ function (_d3chart) {
     key: "setScales",
     value: function setScales() {
       if (this.cfg.color.scheme instanceof Array === true) {
-        this.colorScale = d3$6.scaleOrdinal().range(this.cfg.color.scheme);
+        this.colorScale = d3$7.scaleOrdinal().range(this.cfg.color.scheme);
       } else if (typeof this.cfg.color.scheme === 'string') {
-        this.colorScale = d3$6.scaleOrdinal(d3$6[this.cfg.color.scheme]);
+        this.colorScale = d3$7.scaleOrdinal(d3$7[this.cfg.color.scheme]);
       }
     }
     /**
@@ -2628,35 +3118,35 @@ function (_d3chart) {
   }]);
 
   return d3wordscloud;
-}(d3chart);var script$6 = {
+}(d3chart);var script$7 = {
   name: 'D3WordsCloud',
   extends: __vue_component__,
   mounted: function mounted() {
     this.chart = new d3wordscloud(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
   }
 };/* script */
-var __vue_script__$6 = script$6;
+var __vue_script__$7 = script$7;
 /* template */
 
 /* style */
 
-var __vue_inject_styles__$6 = undefined;
+var __vue_inject_styles__$7 = undefined;
 /* scoped */
 
-var __vue_scope_id__$6 = undefined;
+var __vue_scope_id__$7 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$6 = "data-v-66b7e034";
+var __vue_module_identifier__$7 = "data-v-66b7e034";
 /* functional template */
 
-var __vue_is_functional_template__$6 = undefined;
+var __vue_is_functional_template__$7 = undefined;
 /* style inject */
 
 /* style inject SSR */
 
 /* style inject shadow dom */
 
-var __vue_component__$6 = normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);var d3$7 = {
+var __vue_component__$7 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, undefined, undefined, undefined);var d3$8 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -2719,15 +3209,15 @@ var __vue_component__$6 = normalizeComponent({}, __vue_inject_styles__$6, __vue_
 * D3 Slices Chart
 */
 
-var d3sliceschart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3sliceschart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3sliceschart, _d3chart);
+
+  var _super = _createSuper(d3sliceschart);
 
   function d3sliceschart(selection, data, config) {
     _classCallCheck(this, d3sliceschart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3sliceschart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 40,
         right: 20,
@@ -2754,7 +3244,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2767,10 +3257,10 @@ function (_d3chart) {
       // Set up dimensions
       this.getDimensions();
       this.initChartFrame('sliceschart');
-      this.cScale = d3$7.scaleOrdinal();
-      this.rScale = d3$7.scaleLinear();
-      this.arc = d3$7.arc();
-      this.pie = d3$7.pie().sort(null).value(function () {
+      this.cScale = d3$8.scaleOrdinal();
+      this.rScale = d3$8.scaleLinear();
+      this.arc = d3$8.arc();
+      this.pie = d3$8.pie().sort(null).value(function () {
         return 1;
       }).padAngle(this.cfg.radius.padding);
 
@@ -2808,7 +3298,7 @@ function (_d3chart) {
         return d.data[_this.cfg.key];
       }); // Set transition
 
-      this.transition = d3$7.transition('t').duration(this.cfg.transition.duration).ease(d3$7[this.cfg.transition.ease]);
+      this.transition = d3$8.transition('t').duration(this.cfg.transition.duration).ease(d3$8[this.cfg.transition.ease]);
     }
     /**
     * Set up scales
@@ -2828,18 +3318,18 @@ function (_d3chart) {
       } // Set up arcs
 
 
-      this.arc = d3$7.arc().outerRadius(this.cfg.radius.outter).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
-      this.rScale.range([this.inRadius, this.cfg.radius.outter]).domain([0, d3$7.max(this.data, function (d) {
+      this.arc = d3$8.arc().outerRadius(this.cfg.radius.outter).innerRadius(this.inRadius).cornerRadius(this.cfg.radius.round);
+      this.rScale.range([this.inRadius, this.cfg.radius.outter]).domain([0, d3$8.max(this.data, function (d) {
         return d[_this2.cfg.value];
       })]); // Set up color scheme
 
       if (this.cfg.color.scheme) {
         if (this.cfg.color.scheme instanceof Array === true) {
-          this.colorScale = d3$7.scaleOrdinal().domain(this.data.map(function (d) {
+          this.colorScale = d3$8.scaleOrdinal().domain(this.data.map(function (d) {
             return d[_this2.cfg.key];
           })).range(this.cfg.color.scheme);
         } else {
-          this.colorScale = d3$7.scaleOrdinal(d3$7[this.cfg.color.scheme]).domain(this.data.map(function (d) {
+          this.colorScale = d3$8.scaleOrdinal(d3$8[this.cfg.color.scheme]).domain(this.data.map(function (d) {
             return d[_this2.cfg.key];
           }));
         }
@@ -2870,7 +3360,7 @@ function (_d3chart) {
       }).transition(this.transition).delay(function (d, i) {
         return i * _this3.cfg.transition.duration;
       }).attrTween('d', function (d) {
-        var i = d3$7.interpolate(d.startAngle + 0.1, d.endAngle);
+        var i = d3$8.interpolate(d.startAngle + 0.1, d.endAngle);
         return function (t) {
           d.endAngle = i(t);
           return _this3.arc(d);
@@ -2882,8 +3372,8 @@ function (_d3chart) {
       newg.append("path").attr("class", "chart__slice chart__slice--sliceschart").transition(this.transition).delay(function (d, i) {
         return i * _this3.cfg.transition.duration;
       }).attrTween('d', function (d) {
-        var i = d3$7.interpolate(d.startAngle + 0.1, d.endAngle);
-        var arc = d3$7.arc().outerRadius(_this3.rScale(d.data[_this3.cfg.value])).innerRadius(_this3.inRadius).cornerRadius(_this3.cfg.radius.round);
+        var i = d3$8.interpolate(d.startAngle + 0.1, d.endAngle);
+        var arc = d3$8.arc().outerRadius(_this3.rScale(d.data[_this3.cfg.value])).innerRadius(_this3.inRadius).cornerRadius(_this3.cfg.radius.round);
         return function (t) {
           d.endAngle = i(t);
           return arc(d);
@@ -2898,25 +3388,25 @@ function (_d3chart) {
 
   }, {
     key: "updateElements",
-    value: function updateElements() {}
-    /*
-            // PATHS
-            this.itemg.selectAll(".chart__slice")
-                .style('opacity', 0)
-                .data(this.pie(this.data), d => d.data[this.cfg.key])
-                .transition(this.transition)
-                .delay((d,i) => i * this.cfg.transition.duration)
-                .attrTween('d', d => {
-                    const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
-                    return t => {
-                        d.endAngle = i(t); 
-                        return this.arc(d)
-                    }
-                })
-                .style("fill", this.cfg.color.default)
-                .style('opacity', 1);
-    */
-
+    value: function updateElements() {
+      /*
+              // PATHS
+              this.itemg.selectAll(".chart__slice")
+                  .style('opacity', 0)
+                  .data(this.pie(this.data), d => d.data[this.cfg.key])
+                  .transition(this.transition)
+                  .delay((d,i) => i * this.cfg.transition.duration)
+                  .attrTween('d', d => {
+                      const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+                      return t => {
+                          d.endAngle = i(t); 
+                          return this.arc(d)
+                      }
+                  })
+                  .style("fill", this.cfg.color.default)
+                  .style('opacity', 1);
+      */
+    }
     /**
     * Remove chart's elements without data
     */
@@ -2942,7 +3432,7 @@ function (_d3chart) {
     value: function arcTween(a) {
       var _this4 = this;
 
-      var i = d3$7.interpolate(this._current, a);
+      var i = d3$8.interpolate(this._current, a);
       this._current = i(0);
       return function (t) {
         return _this4.arc(i(t));
@@ -2951,19 +3441,19 @@ function (_d3chart) {
   }]);
 
   return d3sliceschart;
-}(d3chart);var script$7 = {
+}(d3chart);var script$8 = {
   name: 'D3SlicesChart',
   extends: __vue_component__,
   mounted: function mounted() {
     this.chart = new d3sliceschart(this.$refs.chart, JSON.parse(JSON.stringify(this.datum)), this.config);
   }
 };/* script */
-var __vue_script__$7 = script$7;
+var __vue_script__$8 = script$8;
 /* template */
 
 /* style */
 
-var __vue_inject_styles__$7 = function __vue_inject_styles__(inject) {
+var __vue_inject_styles__$8 = function __vue_inject_styles__(inject) {
   if (!inject) return;
   inject("data-v-6a52c448_0", {
     source: ".chart__wrapper{margin:20px 0}.chart__wrap{margin:0}.chart__title{text-align:center;font-weight:700}.chart__source{font-size:12px}.chart__tooltip{position:absolute;pointer-events:none;display:none}.chart__tooltip.active{display:block}.chart__tooltip>div{background:#2b2b2b;color:#fff;padding:6px 10px;border-radius:3px}.chart__axis{font-size:12px;shape-rendering:crispEdges}.chart__grid .domain{stroke:none;fill:none}.chart__grid .tick line{opacity:.2}.chart__label{font-size:12px}.chart .clickable{cursor:pointer}",
@@ -2974,16 +3464,16 @@ var __vue_inject_styles__$7 = function __vue_inject_styles__(inject) {
 /* scoped */
 
 
-var __vue_scope_id__$7 = undefined;
+var __vue_scope_id__$8 = undefined;
 /* module identifier */
 
-var __vue_module_identifier__$7 = "data-v-6a52c448";
+var __vue_module_identifier__$8 = "data-v-6a52c448";
 /* functional template */
 
-var __vue_is_functional_template__$7 = undefined;
+var __vue_is_functional_template__$8 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$7 = normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, undefined, createInjectorSSR, undefined);/* eslint-disable import/prefer-default-export */var components=/*#__PURE__*/Object.freeze({__proto__:null,D3BarChart: __vue_component__$1,D3LineChart: __vue_component__$2,D3PieChart: __vue_component__$3,D3SlopeChart: __vue_component__$4,D3Sunburst: __vue_component__$5,D3WordsCloud: __vue_component__$6,D3SlicesChart: __vue_component__$7});var install = function installVueD3Charts(Vue) {
+var __vue_component__$8 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, false, undefined, createInjectorSSR, undefined);/* eslint-disable import/prefer-default-export */var components=/*#__PURE__*/Object.freeze({__proto__:null,D3BarChart: __vue_component__$1,D3LineChart: __vue_component__$2,D3AreaChart: __vue_component__$3,D3PieChart: __vue_component__$4,D3SlopeChart: __vue_component__$5,D3Sunburst: __vue_component__$6,D3WordsCloud: __vue_component__$7,D3SlicesChart: __vue_component__$8});var install = function installVueD3Charts(Vue) {
   if (install.installed) return;
   install.installed = true;
   Object.entries(components).forEach(function (_ref) {
@@ -3014,4 +3504,4 @@ if (typeof window !== 'undefined') {
 if (GlobalVue) {
   GlobalVue.use(plugin);
 } // Default export is library as a whole, registered via Vue.use()
-exports.D3BarChart=__vue_component__$1;exports.D3LineChart=__vue_component__$2;exports.D3PieChart=__vue_component__$3;exports.D3SlicesChart=__vue_component__$7;exports.D3SlopeChart=__vue_component__$4;exports.D3Sunburst=__vue_component__$5;exports.D3WordsCloud=__vue_component__$6;exports.default=plugin;
+exports.D3AreaChart=__vue_component__$3;exports.D3BarChart=__vue_component__$1;exports.D3LineChart=__vue_component__$2;exports.D3PieChart=__vue_component__$4;exports.D3SlicesChart=__vue_component__$8;exports.D3SlopeChart=__vue_component__$5;exports.D3Sunburst=__vue_component__$6;exports.D3WordsCloud=__vue_component__$7;exports.default=plugin;
